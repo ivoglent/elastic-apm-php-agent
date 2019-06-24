@@ -44,7 +44,7 @@ class Metricset extends TimedTrace
     {
         $payload = [
           'metricset' => [
-              'timestamp' => $this->getNow(),
+              'timestamp' => $this->getTimer()->getNow(),
               'samples'   => $this->samples,
           ]
       ];

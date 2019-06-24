@@ -11,6 +11,8 @@
 
 namespace PhilKra\Stores;
 
+use PhilKra\Traces\Error;
+use PhilKra\Traces\Span;
 use PhilKra\Traces\Trace;
 
 /**
@@ -81,14 +83,19 @@ class TracesStore implements \JsonSerializable
 
     /**
      * Generator to ND-JSON for Intake API v2
+     * if object is not instance of Span or Error which contains child array type
+     *
      *
      * @return string
      */
     public function toNdJson() : string
     {
+
         return sprintf("%s\n", implode("\n", array_map(function($obj) {
+            if (($obj instanceof Span || $obj instanceof Error) && !empty($obj->getStacktrace())) {
+                return json_encode($obj);
+            }
             return json_encode($obj, JSON_FORCE_OBJECT);
         }, $this->list())));
     }
-
 }

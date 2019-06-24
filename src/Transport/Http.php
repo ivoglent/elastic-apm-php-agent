@@ -62,8 +62,6 @@ class Http extends Connector
     public function send(TracesStore $store) : bool
     {
         $endpoint = sprintf('%s/intake/v2/events', $this->config->get('transport.host'));
-        var_dump($store->toNdJson());
-
         $request = new Request(
             'POST',
             $endpoint,

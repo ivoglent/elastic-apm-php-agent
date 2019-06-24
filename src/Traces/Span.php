@@ -121,11 +121,38 @@ class Span extends Event
      *
      * @param SpanContext $context
      */
-    public function addContext(SpanContext $context) : void
+    public function addContext($type = 'db', SpanContext $context) : void
     {
-        $this->contexts[] = $context;
+        $this->contexts[$type] = $context;
     }
 
+    /**
+     * Set stack trace for this span
+     *
+     * @param Stacktrace $stacktrace
+     */
+    public function addStacktrace(Stacktrace $stacktrace) {
+        $this->stacktrace[] = $stacktrace;
+    }
+
+    /**
+     * Set stack traces for this span
+     *
+     * @param Stacktrace[] $stacktrace
+     */
+    public function addStacktraces(array $stacktraces) {
+        $this->stacktrace = $stacktraces;
+    }
+
+    /**
+     * Get current stack straces
+     *
+     * @return mixed
+     */
+    public function getStacktrace() {
+        return $this->stacktrace;
+    }
+    
     /**
      * Serialize Span
      *
@@ -144,6 +171,8 @@ class Span extends Event
               'timestamp'      => $this->getTimer()->getNow(),
               'duration'       => $this->getDuration(),
               'sync'           => $this->sync,
+              'context'        => $this->contexts,
+              'stacktrace'     => $this->stacktrace
           ]
       ];
 

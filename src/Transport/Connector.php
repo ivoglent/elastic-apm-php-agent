@@ -28,7 +28,7 @@ abstract class Connector
      *
      * @var \PhilKra\Helper\Config
      */
-    private $config;
+    protected $config;
 
     /**
      * @param \PhilKra\Helper\Config $config

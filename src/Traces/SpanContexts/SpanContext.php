@@ -18,6 +18,6 @@ namespace PhilKra\Traces\SpanContexts;
  * @link https://www.elastic.co/guide/en/apm/server/6.7/span-api.html
  *
  */
-class SpanContext {
+class SpanContext extends \StdClass{
 
 }
