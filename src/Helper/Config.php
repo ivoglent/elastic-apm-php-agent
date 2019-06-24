@@ -1,8 +1,18 @@
 <?php
+/**
+ * This file is part of the PhilKra/elastic-apm-php-agent library
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @license http://opensource.org/licenses/MIT MIT
+ * @link https://github.com/philkra/elastic-apm-php-agent GitHub
+ */
 
 namespace PhilKra\Helper;
 
 use PhilKra\Exception\MissingAppNameException;
+use PhilKra\Exception\Serializers\UnsupportedApmVersionException;
 
 /**
  *
@@ -11,6 +21,7 @@ use PhilKra\Exception\MissingAppNameException;
  */
 class Config
 {
+
     /**
      * Config Set
      *
@@ -23,12 +34,11 @@ class Config
      */
     public function __construct(array $config)
     {
-        if (isset($config['appName']) === false) {
+        if (isset($config['name']) === false) {
             throw new MissingAppNameException();
         }
 
-        // Register Merged Config
-        $this->config = array_merge($this->getDefaultConfig(), $config);
+        $this->config = array_replace_recursive($this->getDefaultConfig(), $config);
     }
 
     /**
@@ -41,7 +51,7 @@ class Config
      */
     public function get(string $key, $default = null)
     {
-        return ($this->config[$key]) ?? $default;
+        return $this->getValueByKey($key, $this->asArray(), $default);
     }
 
     /**
@@ -54,6 +64,21 @@ class Config
         return $this->config;
     }
 
+    public function apmVersion(): string
+    {
+        return $this->config['apmVersion'];
+    }
+
+    public function useVersion1(): bool
+    {
+        return $this->config['apmVersion'] === 'v1';
+    }
+
+    public function useVersion2(): bool
+    {
+        return $this->config['apmVersion'] === 'v2';
+    }
+
     /**
      * Get the Default Config of the Agent
      *
@@ -64,18 +89,67 @@ class Config
     private function getDefaultConfig() : array
     {
         return [
-            'serverUrl'      => 'http://127.0.0.1:8200',
+            'transport'      => [
+                'method' => 'http',
+                'host'   => 'http://127.0.0.1:8200',
+                'config' => [
+                    'timeout' => 5,
+                ],
+            ],
             'secretToken'    => null,
             'hostname'       => gethostname(),
-            'appVersion'     => '',
+            'appVersion'     => '0.0.0',
             'active'         => true,
-            'timeout'        => 5,
-            'apmVersion'     => 'v1',
+            'environment'    => 'development',
             'env'            => [],
             'cookies'        => [],
-            'httpClient'     => [],
-            'environment'    => 'development',
             'backtraceLimit' => 0,
         ];
     }
+
+    /**
+     * Allow access to the Config with the dot.notation
+     *
+     * @credit Selvin Ortiz
+     * @link https://selvinortiz.com/blog/traversing-arrays-using-dot-notation
+     *
+     * @param string $key
+     * @param mixed $default
+     *
+     * @return mixed
+     */
+    private function getValueByKey($key, array $data, $default = null)
+    {
+        // @assert $key is a non-empty string
+        // @assert $data is a loopable array
+        // @otherwise return $default value
+        if (!is_string($key) || empty($key) || !count($data))
+        {
+            return $default;
+        }
+
+        // @assert $key contains a dot notated string
+        if (strpos($key, '.') !== false)
+        {
+            $keys = explode('.', $key);
+
+            foreach ($keys as $innerKey)
+            {
+                // @assert $data[$innerKey] is available to continue
+                // @otherwise return $default value
+                if (!array_key_exists($innerKey, $data))
+                {
+                    return $default;
+                }
+
+                $data = $data[$innerKey];
+            }
+
+            return $data;
+        }
+
+        // @fallback returning value of $key in $data or $default value
+        return array_key_exists($key, $data) ? $data[$key] : $default;
+    }
+
 }
