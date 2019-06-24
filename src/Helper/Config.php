@@ -64,6 +64,21 @@ class Config
         return $this->config;
     }
 
+    public function apmVersion(): string
+    {
+        return $this->config['apmVersion'];
+    }
+
+    public function useVersion1(): bool
+    {
+        return $this->config['apmVersion'] === 'v1';
+    }
+
+    public function useVersion2(): bool
+    {
+        return $this->config['apmVersion'] === 'v2';
+    }
+
     /**
      * Get the Default Config of the Agent
      *

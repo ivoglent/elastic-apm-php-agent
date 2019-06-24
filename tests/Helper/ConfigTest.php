@@ -46,7 +46,11 @@ final class ConfigTest extends TestCase
         $this->assertEquals($config['hostname'], gethostname());
         $this->assertTrue($config['active']);
         $this->assertEquals($config['timeout'], 5);
+<<<<<<< HEAD
         $this->assertEquals($config['apmVersion'], Config::DEFAULT_APM_VERSION);
+=======
+        $this->assertEquals($config['apmVersion'], 'v1');
+>>>>>>> 994598fb63d890fa46dbd3e877b725083bc01ed4
         $this->assertEquals($config['env'], []);
         $this->assertEquals($config['cookies'], []);
         $this->assertEquals($config['httpClient'], []);
@@ -100,10 +104,25 @@ final class ConfigTest extends TestCase
 
         $agent = new Agent($init);
         $this->assertEquals($agent->getConfig()->get('appName'), $init['appName']);
+<<<<<<< HEAD
+=======
     }
 
     /**
      * @covers \PhilKra\Helper\Config::__construct
+     * @covers \PhilKra\Helper\Config::apmVersion
+     */
+    public function testCanGetDefaultApmVersion()
+    {
+        $config = new Config(['appName' => 'Test App']);
+
+        $this->assertEquals(Config::DEFAULT_APM_VERSION, $config->apmVersion());
+>>>>>>> 994598fb63d890fa46dbd3e877b725083bc01ed4
+    }
+
+    /**
+     * @covers \PhilKra\Helper\Config::__construct
+<<<<<<< HEAD
      * @covers \PhilKra\Helper\Config::getApmVersion
      */
     public function testCanGetDefaultApmVersion()
@@ -116,11 +135,15 @@ final class ConfigTest extends TestCase
     /**
      * @covers \PhilKra\Helper\Config::__construct
      * @covers \PhilKra\Helper\Config::getApmVersion
+=======
+     * @covers \PhilKra\Helper\Config::apmVersion
+>>>>>>> 994598fb63d890fa46dbd3e877b725083bc01ed4
      */
     public function testCanUseSpecificApmVersion()
     {
         $config = new Config(['appName' => 'Test App', 'apmVersion' => 'v2']);
 
+<<<<<<< HEAD
         $this->assertEquals('v2', $config->getApmVersion());
     }
 
@@ -132,11 +155,17 @@ final class ConfigTest extends TestCase
     {
         $config = new Config(['appName' => 'Test App', 'apmVersion' => 'V2']);
         $this->assertEquals('v2', $config->getApmVersion());
+=======
+        $this->assertEquals('v2', $config->apmVersion());
+>>>>>>> 994598fb63d890fa46dbd3e877b725083bc01ed4
     }
 
     /**
      * @covers \PhilKra\Helper\Config::__construct
+<<<<<<< HEAD
      * @covers \PhilKra\Helper\Config::getApmVersion
+=======
+>>>>>>> 994598fb63d890fa46dbd3e877b725083bc01ed4
      * @covers \PhilKra\Helper\Config::useVersion1
      * @covers \PhilKra\Helper\Config::useVersion2
      *

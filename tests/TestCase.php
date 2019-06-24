@@ -52,9 +52,12 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
 
     protected function makeTransactionsStore(array $transactions = []): TransactionsStore
     {
+<<<<<<< HEAD
 
         $store = new TransactionsStore();
 
+=======
+>>>>>>> 994598fb63d890fa46dbd3e877b725083bc01ed4
         /** @var TransactionsStore|MockObject $transactionStore */
         $transactionStore = $this->createMock(TransactionsStore::class);
         $transactionStore
@@ -63,9 +66,12 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
         $transactionStore
             ->method('isEmpty')
             ->willReturn(empty($transactions));
+<<<<<<< HEAD
         $transactionStore
             ->method('list')
             ->willReturn($transactions);
+=======
+>>>>>>> 994598fb63d890fa46dbd3e877b725083bc01ed4
 
         return $transactionStore;
     }
@@ -123,4 +129,8 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
 
         return $this->container[$index]['request'];
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 994598fb63d890fa46dbd3e877b725083bc01ed4
