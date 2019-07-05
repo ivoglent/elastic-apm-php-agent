@@ -144,11 +144,7 @@ class Agent
     /**
      * Get the Agent Config
      *
-<<<<<<< HEAD
-     * @return Transaction
-=======
      * @return \PhilKra\Helper\Config
->>>>>>> v2
      */
     public function getConfig() : \PhilKra\Helper\Config
     {
@@ -195,9 +191,8 @@ class Agent
             $this->transactionsStore->reset();
             return true;
         }
-
+        
         $status = true;
-
         // Commit the Errors
         if ($this->traces->isEmpty() === false) {
             $status = TransportFactory::new($this->config)->send($this->traces);

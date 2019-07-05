@@ -20,7 +20,7 @@ use PhilKra\Stores\TracesStore;
  * Connector which Transmits the Data to the Endpoints
  *
  */
-abstract class Connector
+abstract class Connector implements TransportInterface
 {
 
     /**
@@ -38,13 +38,5 @@ abstract class Connector
         $this->config = $config;
     }
 
-    /**
-     * Transmit the traces to the APM Server
-     *
-     * @param PhilKra\Stores\TracesStore $store
-     *
-     * @return bool
-     */
-    public abstract function send(TracesStore $store) : bool;
-
+    
 }

@@ -31,7 +31,7 @@ final class TransportFactory
      *
      * @return Connector
      */
-    public static function new(Config $config) : Connector
+    public static function new(Config $config) : TransportInterface
     {
         // Read the Config
         $transport = $config->get('transport');
@@ -41,12 +41,11 @@ final class TransportFactory
         if ($method === 'http') {
             return new Http($config);
         }
-
-        // TODO -- via Socket
-        // TODO -- put to message queue
-
-        // Ooops!?!
-        throw new UnsupportedConnectorTypeException($method);
+        if(empty($transport['class'])) {
+            throw new \RuntimeException('Invalid transport class for APM');
+        }
+        $transportClass = $transport['class'];
+        return new $transportClass($config);
     }
 
 }

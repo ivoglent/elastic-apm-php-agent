@@ -93,7 +93,7 @@ class Transaction extends Event
           'transaction' => [
               'id'             => $this->getId(),
               'trace_id'       => $this->getTraceId(),
-        //      'parent_id'      => $this->getParentId(),
+              //'parent_id'      => $this->getParentId(),
               'name'           => $this->name,
               'type'           => $this->type,
               'timestamp'      => $this->getTimer()->getNow(),

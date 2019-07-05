@@ -55,9 +55,9 @@ class TimedTrace implements Trace
     /**
      * Get the Duration
      *
-     * @return int
+     * @return float
      */
-    public function getDuration() : int
+    public function getDuration() : float
     {
         return $this->timer->getElapsed();
     }

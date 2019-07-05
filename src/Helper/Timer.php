@@ -14,14 +14,14 @@ class Timer
     /**
      * Starting Timestamp
      *
-     * @var double
+     * @var float
      */
     private $startedOn = null;
 
     /**
      * Ending Timestamp
      *
-     * @var double
+     * @var float
      */
     private $stoppedOn = null;
 
@@ -32,7 +32,7 @@ class Timer
      */
     public function getNow() : int
     {
-        return $this->toMicro(round(microtime(true)));
+        return time() * 1000000;
     }
 
     /**
@@ -46,7 +46,6 @@ class Timer
         if (null !== $this->startedOn) {
             throw new AlreadyRunningException();
         }
-
         $this->startedOn = ($startTime !== null) ? $startTime : microtime(true);
     }
 
@@ -71,15 +70,14 @@ class Timer
      *
      * @throws \PhilKra\Exception\Timer\NotStoppedException
      *
-     * @return int
+     * @return float
      */
-    public function getDuration() : int
+    public function getDuration() : float
     {
         if ($this->stoppedOn === null) {
             throw new NotStoppedException();
         }
-
-        return $this->toMicro($this->stoppedOn - $this->startedOn);
+        return $this->microToMili($this->stoppedOn - $this->startedOn);
     }
 
     /**
@@ -96,20 +94,15 @@ class Timer
         }
 
         return ($this->stoppedOn === null) ?
-            $this->toMicro(microtime(true) - $this->startedOn) :
+            $this->microToMili(microtime(true) - $this->startedOn) :
             $this->getDuration();
     }
 
     /**
-     * Convert the Duration from Seconds to Micro-Seconds
-     *
-     * @param  float $num
-     *
+     * @param float $num
      * @return float
      */
-    private function toMicro(float $num) : float
-    {
-        return $num * 1000000;
+    private function microToMili(float $num):float {
+        return round($num * 1000, 3);
     }
-
 }

@@ -160,19 +160,14 @@ class Error extends Event
             }
 
             if (isset($trace['file']) === true) {
-                $item += [
-                    'filename' => basename($trace['file']),
-                    'abs_path' => $trace['file']
-                ];
+                $item['filename'] = basename($trace['file']);
+                $item['abs_path'] = ($trace['file']);
             }
 
             if (isset($trace['class']) === true) {
                 $item['module'] = $trace['class'];
             }
 
-            if (isset($trace['type']) === true) {
-                $item['type'] = $trace['type'];
-            }
 
             if (!isset($item['lineno'])) {
                 $item['lineno'] = 0;
@@ -182,10 +177,8 @@ class Error extends Event
                 $item['filename'] = '(anonymous)';
             }
 
-            array_push($stacktrace, $item);
+            $stacktrace[] =  $item;
         }
-
-
         return $stacktrace;
     }
 
