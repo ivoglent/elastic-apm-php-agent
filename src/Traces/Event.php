@@ -127,4 +127,13 @@ class Event extends TimedTrace
         return sprintf("%x", mt_rand(100000000, 999999999));
     }
 
+    /**
+     * Support for custom transaction/trace ID
+     *
+     * @param string $id
+     */
+    public function setId(string  $id) {
+        $this->id = $id;
+    }
+
 }

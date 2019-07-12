@@ -72,9 +72,9 @@ class Http extends Connector
             $response = $this->client->send($request);
             return ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300);
         } catch (\Exception $e) {
-            //print_r([$endpoint, $e->getMessage(),  $store->toNdJson()]);exit;
+            //print_r([$endpoint, $request->getMethod(), $e->getMessage(),  $store->toNdJson()]);exit;
         }
-
+        return false;
     }
 
     /**

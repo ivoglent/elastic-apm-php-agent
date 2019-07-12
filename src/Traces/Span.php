@@ -171,7 +171,7 @@ class Span extends Event
               'timestamp'      => $this->getTimer()->getNow(),
               'duration'       => $this->getDuration(),
               'sync'           => $this->sync,
-              'context'        => $this->contexts,
+              'context'        => empty($this->contexts) ? null : $this->contexts,
               'stacktrace'     => $this->stacktrace
           ]
       ];

@@ -55,7 +55,7 @@ class Agent
      *
      * @var \PhilKra\Stores\TracesStore
      */
-    private $traces;
+    public $traces;
 
     /**
      * Apm Timer
