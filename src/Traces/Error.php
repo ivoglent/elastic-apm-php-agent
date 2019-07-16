@@ -76,7 +76,7 @@ class Error extends Event
     public function setTransaction(Transaction $transaction) {
         $this->transaction = $transaction;
         $this->transaction_id = $transaction->getId();
-        $this->setTraceId($transaction->getId());
+        $this->setTraceId($transaction->getTraceId());
     }
 
     /**
