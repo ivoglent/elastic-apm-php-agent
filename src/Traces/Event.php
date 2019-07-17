@@ -26,14 +26,25 @@ class Event extends TimedTrace
      *
      * @var string
      */
-    private $traceId;
+    protected $traceId;
 
     /**
      * Hex encoded 64 random bits ID of the parent transaction or span.
      *
      * @var string
      */
-    private $parentId;
+    protected $parentId;
+
+    /**
+     * Hex encoded 64 random bits ID of transaction
+     * @var string
+     */
+    protected $transaction_id;
+
+    /**
+     * @var Transaction
+     */
+    protected $transaction;
 
     /**
      * Init the Event with the Timestamp and UUID
@@ -136,4 +147,15 @@ class Event extends TimedTrace
         $this->id = $id;
     }
 
+    /**
+     * Set the correlating Transaction
+     *
+     * @param Transaction $transaction
+     */
+    public function setTransaction(Transaction $transaction) : void
+    {
+        $this->transaction = $transaction;
+        $this->transaction_id = $transaction->getId();
+        $this->setTraceId($transaction->getTraceId());
+    }
 }

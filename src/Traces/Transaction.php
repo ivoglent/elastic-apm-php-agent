@@ -71,7 +71,6 @@ class Transaction extends Event
         $this->name = trim($name);
         $this->type = trim($type);
     }
-
     /**
      * Add a Span to the Transaction
      *
@@ -149,7 +148,6 @@ class Transaction extends Event
               ],
           ]
       ];
-
       return $payload;
     }
 

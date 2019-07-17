@@ -62,12 +62,6 @@ class Span extends Event
      */
     private $sync = false;
 
-    /**
-     * Hex encoded 64 random bits ID of the correlated transaction.
-     *
-     * @var string
-     */
-    private $transaction_id;
 
     /**
      * Offset relative to the transaction's timestamp identifying the start of the span, in milliseconds
@@ -105,16 +99,6 @@ class Span extends Event
         $this->type = trim($type);
     }
 
-    /**
-     * Set the correlating Transaction
-     *
-     * @param Transaction $transaction
-     */
-    public function setTransaction(Transaction $transaction) : void
-    {
-        $this->transaction_id = $transaction->getId();
-        $this->setTraceId($transaction->getTraceId());
-    }
 
     /**
      * Add a SpanContext

@@ -22,21 +22,12 @@ namespace PhilKra\Traces;
 class Error extends Event
 {
 
-    /**
-     * @var string
-     */
-    private $transaction_id;
-
 
     /**
      * @var array
      */
     private $stacktrace;
 
-    /**
-     * @var Transaction
-     */
-    private $transaction;
 
     /**
      * @var
@@ -68,15 +59,6 @@ class Error extends Event
      */
     public function getContext() {
         return $this->contex;
-    }
-
-    /**
-     * @param Transaction $transaction
-     */
-    public function setTransaction(Transaction $transaction) {
-        $this->transaction = $transaction;
-        $this->transaction_id = $transaction->getId();
-        $this->setTraceId($transaction->getTraceId());
     }
 
     /**

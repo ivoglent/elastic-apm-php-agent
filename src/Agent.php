@@ -16,9 +16,11 @@ namespace PhilKra;
 use PhilKra\Stores\TracesStore;
 use PhilKra\Factories\TracesFactory;
 use PhilKra\Factories\DefaultTracesFactory;
+use PhilKra\Traces\Event;
 use PhilKra\Traces\Trace;
 use PhilKra\Helper\Timer;
 use PhilKra\Helper\Config;
+use PhilKra\Traces\Transaction;
 use PhilKra\Transport\Connector;
 use PhilKra\Transport\TransportFactory;
 
@@ -161,6 +163,21 @@ class Agent
     public function register(Trace $trace) : void
     {
         $this->traces->register($trace);
+    }
+
+    /**
+     * Reset transaction if it has any change on name, id or traceId
+     *
+     * @param Transaction $transaction
+     */
+    public function setTransaction(Transaction $transaction) {
+        foreach ($this->traces as &$trace) {
+            if ($trace instanceof Transaction) {
+                continue;
+            }
+            /** @var Event $trace */
+            $trace->setTransaction($transaction);
+        }
     }
 
     /**
