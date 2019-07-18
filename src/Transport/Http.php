@@ -73,14 +73,16 @@ class Http extends Connector
         try {
             $response = $this->client->send($request);
             $logger = $this->config->get('logger', null);
-            if (!empty($logger)) {
+            if (!empty($logger) && $logger instanceof LoggerInterface) {
                 /** @var LoggerInterface $logger */
                 $logger->info(sprintf('Sending APM data : %s to endpoint: %s and got result: %d', $data, $endpoint, $response->getStatusCode()));
             }
             return ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300);
         } catch (\Exception $e) {
-            /** @var LoggerInterface $logger */
-            $logger->info(sprintf('Error sending APM data : %s to endpoint: %s and error: %s', $data, $endpoint, $e->getMessage()));
+            if (!empty($logger) && $logger instanceof LoggerInterface) {
+                /** @var LoggerInterface $logger */
+                $logger->info(sprintf('Error sending APM data : %s to endpoint: %s and error: %s', $data, $endpoint, $e->getMessage()));
+            }
         }
         return false;
     }
