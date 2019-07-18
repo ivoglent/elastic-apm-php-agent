@@ -21,6 +21,8 @@ use PhilKra\Helper\Timer;
 class TimedTrace implements Trace
 {
 
+    /** @var float */
+    protected $timestamp;
     /**
      * @var Timer
      */
@@ -42,6 +44,7 @@ class TimedTrace implements Trace
     public function start(?float $initAt = null) : void
     {
         $this->timer->start($initAt);
+        $this->timestamp = $this->timer->getNow();
     }
 
     /**
@@ -68,6 +71,10 @@ class TimedTrace implements Trace
     protected function getTimer() : Timer
     {
         return $this->timer;
+    }
+
+    public function getCurrentEslapsedTime(): int  {
+        $currentTime =  time();
     }
 
     /**

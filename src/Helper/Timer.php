@@ -32,7 +32,7 @@ class Timer
      */
     public function getNow() : int
     {
-        return time() * 1000000;
+        return $this->microSeconds();
     }
 
     /**
@@ -46,7 +46,7 @@ class Timer
         if (null !== $this->startedOn) {
             throw new AlreadyRunningException();
         }
-        $this->startedOn = ($startTime !== null) ? $startTime : microtime(true);
+        $this->startedOn = ($startTime !== null) ? $startTime : $this->milliSeconds();
     }
 
     /**
@@ -62,11 +62,11 @@ class Timer
             throw new NotStartedException();
         }
 
-        $this->stoppedOn = microtime(true);
+        $this->stoppedOn = $this->milliSeconds();
     }
 
     /**
-     * Get the elapsed Duration of this Timer in MicroSeconds
+     * Get the elapsed Duration of this Timer in Miliseconds
      *
      * @throws \PhilKra\Exception\Timer\NotStoppedException
      *
@@ -77,11 +77,11 @@ class Timer
         if ($this->stoppedOn === null) {
             throw new NotStoppedException();
         }
-        return $this->microToMili($this->stoppedOn - $this->startedOn);
+        return $this->stoppedOn - $this->startedOn;
     }
 
     /**
-     * Get the current elapsed Interval of the Timer in MicroSeconds
+     * Get the current elapsed Interval of the Timer in Miliseconds
      *
      * @throws \PhilKra\Exception\Timer\NotStartedException
      *
@@ -94,15 +94,23 @@ class Timer
         }
 
         return ($this->stoppedOn === null) ?
-            $this->microToMili(microtime(true) - $this->startedOn) :
+            $this->milliSeconds() - $this->startedOn :
             $this->getDuration();
     }
 
     /**
-     * @param float $num
      * @return float
      */
-    private function microToMili(float $num):float {
-        return round($num * 1000, 3);
+    private function milliSeconds(): float {
+        $mt = explode(' ', microtime());
+        return ((float)$mt[1]) * 1000 + ((int)round($mt[0] * 1000));
+    }
+
+    /**
+     * @return int
+     */
+    private function microSeconds(): int {
+        $mt = explode(' ', microtime());
+        return ((int)$mt[1]) * 1000000 + ((int)round($mt[0] * 1000000));
     }
 }

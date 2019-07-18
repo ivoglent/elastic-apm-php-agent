@@ -37,16 +37,18 @@ interface TracesFactory
      *
      * @param string $name
      * @param string $type
+     * @param string $action
      *
      * @return Span
      */
-    public function newSpan(string $name, string $type) : Span;
+    public function newSpan(string $name, string $type, ?string $action = null) : Span;
 
     /**
      * Generate new Transaction
      *
      * @param string $name
      * @param string $type
+
      *
      * @return Transaction
      */

@@ -55,13 +55,13 @@ class Span extends Event
      */
     private $type;
 
+
     /**
      * Indicates whether the span was executed synchronously or asynchronously.
      *
      * @var bool
      */
     private $sync = false;
-
 
     /**
      * Offset relative to the transaction's timestamp identifying the start of the span, in milliseconds
@@ -89,14 +89,33 @@ class Span extends Event
      *
      * @var string
      */
-    private $action;
+    private $action = null;
 
-    public function __construct(string $name, string $type)
+    public function __construct(string $name, string $type, string $action = null)
     {
         parent::__construct();
 
         $this->name = trim($name);
         $this->type = trim($type);
+        $this->action = $action;
+    }
+
+    /**
+     * @param float|null $initAt
+     * @throws \PhilKra\Exception\Timer\NotStartedException
+     */
+    public function start(?float $initAt = null): void
+    {
+        parent::start($initAt);
+        $this->start = $this->transaction->getTimer()->getElapsed();
+    }
+
+    /**
+     * @param string $action
+     */
+    public function setAction(string $action): void
+    {
+        $this->action = $action;
     }
 
 
@@ -147,12 +166,14 @@ class Span extends Event
         $payload = [
           'span' => [
               'id'             => $this->getId(),
+              'action'         => $this->action,
               'transaction_id' => $this->transaction_id,
               'trace_id'       => $this->getTraceId(),
+              'start'          => $this->start,
               'parent_id'      => $this->getParentId(),
               'name'           => $this->name,
               'type'           => $this->type,
-              'timestamp'      => $this->getTimer()->getNow(),
+              'timestamp'      => $this->timestamp,
               'duration'       => $this->getDuration(),
               'sync'           => $this->sync,
               'context'        => empty($this->contexts) ? null : $this->contexts,

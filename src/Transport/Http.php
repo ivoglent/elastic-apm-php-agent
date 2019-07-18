@@ -16,6 +16,7 @@ use \PhilKra\Helper\Config;
 use PhilKra\Stores\TracesStore;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Client;
+use Psr\Log\LoggerInterface;
 
 /**
  *
@@ -62,17 +63,24 @@ class Http extends Connector
     public function send(TracesStore $store) : bool
     {
         $endpoint = sprintf('%s/intake/v2/events', $this->config->get('transport.host'));
+        $data = $store->toNdJson();
         $request = new Request(
             'POST',
             $endpoint,
             $this->getRequestHeaders(),
-            $store->toNdJson()
+            $data
         );
         try {
             $response = $this->client->send($request);
+            $logger = $this->config->get('logger', null);
+            if (!empty($logger)) {
+                /** @var LoggerInterface $logger */
+                $logger->info(sprintf('Sending APM data : %s to endpoint: %s and got result: %d', $data, $endpoint, $response->getStatusCode()));
+            }
             return ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300);
         } catch (\Exception $e) {
-            //print_r([$endpoint, $request->getMethod(), $e->getMessage(),  $store->toNdJson()]);exit;
+            /** @var LoggerInterface $logger */
+            $logger->info(sprintf('Error sending APM data : %s to endpoint: %s and error: %s', $data, $endpoint, $e->getMessage()));
         }
         return false;
     }

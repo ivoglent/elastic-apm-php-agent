@@ -139,7 +139,7 @@ class Transaction extends Event
               //'parent_id'      => $this->getParentId(),
               'name'           => $this->name,
               'type'           => $this->type,
-              'timestamp'      => $this->getTimer()->getNow(),
+              'timestamp'      => $this->timestamp,
               'duration'       => $this->getDuration(),
               'sampled'        => $this->sampled,
               'span_count'     => [

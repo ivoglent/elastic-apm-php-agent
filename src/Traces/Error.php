@@ -104,7 +104,7 @@ class Error extends Event
         $paload = [
             'error' => [
                 'id'        => $this->getId(),
-                'timestamp' => $this->getTimer()->getNow(),
+                'timestamp' => $this->timestamp,
                 'context'   => $this->getContext(),
                 'culprit'   => sprintf('%s:%d', $this->throwable->getFile(), $this->throwable->getLine()),
                 'exception' => [

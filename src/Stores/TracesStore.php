@@ -90,7 +90,6 @@ class TracesStore implements \JsonSerializable
      */
     public function toNdJson() : string
     {
-
         return sprintf("%s\n", implode("\n", array_map(function($obj) {
             if (($obj instanceof Span || $obj instanceof Error) && !empty($obj->getStacktrace())) {
                 return json_encode($obj);

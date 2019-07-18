@@ -166,21 +166,6 @@ class Agent
     }
 
     /**
-     * Reset transaction if it has any change on name, id or traceId
-     *
-     * @param Transaction $transaction
-     */
-    public function setTransaction(Transaction $transaction) {
-        foreach ($this->traces as &$trace) {
-            if ($trace instanceof Transaction) {
-                continue;
-            }
-            /** @var Event $trace */
-            $trace->setTransaction($transaction);
-        }
-    }
-
-    /**
      * Get the Data of the Server Information Endpoint
      *
      * @link https://www.elastic.co/guide/en/apm/server/6.7/server-info.html
