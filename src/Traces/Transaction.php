@@ -126,6 +126,16 @@ class Transaction extends Event
     }
 
     /**
+     * @param string $result
+     */
+    public function setResult(string $result): void
+    {
+        $this->result = $result;
+    }
+
+
+
+    /**
      * Serialize Error
      *
      * @return array

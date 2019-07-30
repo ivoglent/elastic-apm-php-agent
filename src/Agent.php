@@ -13,10 +13,12 @@
 
 namespace PhilKra;
 
+use PhilKra\Helper\System;
 use PhilKra\Stores\TracesStore;
 use PhilKra\Factories\TracesFactory;
 use PhilKra\Factories\DefaultTracesFactory;
 use PhilKra\Traces\Event;
+use PhilKra\Traces\Metricset;
 use PhilKra\Traces\Trace;
 use PhilKra\Helper\Timer;
 use PhilKra\Helper\Config;
@@ -36,7 +38,7 @@ class Agent
      *
      * @var string
      */
-    public const VERSION = '6.7.0';
+    public const VERSION = '7.2.0';
 
     /**
      * Agent Name
@@ -163,6 +165,28 @@ class Agent
     public function register(Trace $trace) : void
     {
         $this->traces->register($trace);
+    }
+
+    /**
+     * Register metrics and default metrics which collected some information about CPU and RAM
+     *
+     * @param array $metrics
+     */
+    public function registerMetrics(?array $metrics = []) {
+        /** @var Metricset $metricset */
+        $metricset = $this->factory()->newMetricset();
+        $systemInfo = (new System())->getSystemInfo();
+        if (!empty($metrics)) {
+            $systemInfo = array_merge($systemInfo, $metrics);
+        }
+        if (!empty($systemInfo)) {
+            foreach ($systemInfo as $key => $value) {
+                $metric = new Metricset\Metric($key, $value);
+                $metricset->put($metric);
+            }
+            $this->register($metricset);
+        }
+
     }
 
     /**
