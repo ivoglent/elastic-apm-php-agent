@@ -20,13 +20,9 @@ class Process implements Trace
      */
     public function jsonSerialize() : array
     {
-        // Build Payload to serialize
         $payload = [
             'pid' => getmypid(),
         ];
-
-        // TODO -- getenv('argv')
-
         return $payload;
     }
 

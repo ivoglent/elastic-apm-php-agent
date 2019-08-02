@@ -43,8 +43,8 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
     protected function makeConfig(array $overrides = []): Config
     {
         $defaults = [
-            'appName' => 'Test Application',
-            'apmVersion' => 'v1',
+            'name' => 'Test Application',
+            'version' => 'v1',
         ];
 
         return new Config(array_merge($defaults, $overrides));

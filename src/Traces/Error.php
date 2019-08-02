@@ -52,6 +52,7 @@ class Error extends Event
         parent::__construct();
         $this->throwable = $throwable;
         $this->stacktrace  = self::mapStacktrace($this->throwable->getTrace());
+        $this->contex = $contexts;
     }
 
     /**

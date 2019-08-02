@@ -28,6 +28,9 @@ class TimedTrace implements Trace
      */
     private $timer;
 
+    /** @var  float */
+    protected $duration;
+
     /**
      * Init the Event with the Timestamp
      */
@@ -53,6 +56,7 @@ class TimedTrace implements Trace
     public function stop() : void
     {
         $this->timer->stop();
+        $this->duration = $this->getDuration();
     }
 
     /**
@@ -71,10 +75,6 @@ class TimedTrace implements Trace
     protected function getTimer() : Timer
     {
         return $this->timer;
-    }
-
-    public function getCurrentEslapsedTime(): int  {
-        $currentTime =  time();
     }
 
     /**

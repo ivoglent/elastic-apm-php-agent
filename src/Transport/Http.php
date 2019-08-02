@@ -37,6 +37,7 @@ class Http extends Connector
      */
     public function __construct(Config $config, Client $client = null)
     {
+        parent::__construct($config);
         $this->config = $config;
         $this->client = $client;
 
@@ -53,8 +54,8 @@ class Http extends Connector
         if (null !== $this->client) {
             return;
         }
-
-        $this->client = new Client($this->config->get('transport.config'));
+        $config = $this->config->get('transport.config');
+        $this->client = new Client($config ?? []);
     }
 
     /**
@@ -70,21 +71,8 @@ class Http extends Connector
             $this->getRequestHeaders(),
             $data
         );
-        try {
-            $response = $this->client->send($request);
-            $logger = $this->config->get('logger', null);
-            if (!empty($logger) && $logger instanceof LoggerInterface) {
-                /** @var LoggerInterface $logger */
-                $logger->info(sprintf('Sending APM data : %s to endpoint: %s and got result: %d', $data, $endpoint, $response->getStatusCode()));
-            }
-            return ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300);
-        } catch (\Exception $e) {
-            if (!empty($logger) && $logger instanceof LoggerInterface) {
-                /** @var LoggerInterface $logger */
-                $logger->info(sprintf('Error sending APM data : %s to endpoint: %s and error: %s', $data, $endpoint, $e->getMessage()));
-            }
-        }
-        return false;
+        $response = $this->client->send($request);
+        return ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300);
     }
 
     /**

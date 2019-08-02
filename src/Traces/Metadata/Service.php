@@ -31,7 +31,7 @@ class Service implements Trace
     /**
      * Serialize Metadata Trace
      *
-     * @throws Exception
+     * @throws \Exception
      *
      * @return array
      */
@@ -56,7 +56,7 @@ class Service implements Trace
             ],
             'environment' => $this->config->get('environment'),
         ];
-        if(empty($this->config->get('framework', [])) === false) {
+        if(empty($this->config->get('framework')) === false) {
             $payload['framework'] = $this->config->get('framework');
         }
 

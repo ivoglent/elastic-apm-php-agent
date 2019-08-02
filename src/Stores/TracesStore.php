@@ -42,9 +42,10 @@ class TracesStore implements \JsonSerializable
     /**
      * Register a Trace
      *
-     * @param Trace
-     *
+     * @param Trace $t
      * @return void
+     * @internal param $Trace
+     *
      */
     public function register(Trace $t) : void
     {

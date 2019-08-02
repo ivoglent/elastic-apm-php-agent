@@ -11,8 +11,7 @@
 
 namespace PhilKra\Helper;
 
-use PhilKra\Exception\MissingAppNameException;
-use PhilKra\Exception\Serializers\UnsupportedApmVersionException;
+use PhilKra\Exception\InvalidConfigException;
 
 /**
  *
@@ -31,11 +30,12 @@ class Config
 
     /**
      * @param array $config
+     * @throws InvalidConfigException
      */
     public function __construct(array $config)
     {
         if (isset($config['name']) === false) {
-            throw new MissingAppNameException();
+            throw new InvalidConfigException();
         }
 
         $this->config = array_replace_recursive($this->getDefaultConfig(), $config);
@@ -64,21 +64,6 @@ class Config
         return $this->config;
     }
 
-    public function apmVersion(): string
-    {
-        return $this->config['apmVersion'];
-    }
-
-    public function useVersion1(): bool
-    {
-        return $this->config['apmVersion'] === 'v1';
-    }
-
-    public function useVersion2(): bool
-    {
-        return $this->config['apmVersion'] === 'v2';
-    }
-
     /**
      * Get the Default Config of the Agent
      *
@@ -98,7 +83,6 @@ class Config
             ],
             'secretToken'    => null,
             'hostname'       => gethostname(),
-            'appVersion'     => '0.0.0',
             'active'         => true,
             'environment'    => 'development',
             'env'            => [],

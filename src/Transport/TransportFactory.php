@@ -19,7 +19,7 @@ use PhilKra\Exception\Transport\UnsupportedConnectorTypeException;
  * Connector Factory for the creation of the Agent to Server Connection
  *
  */
-final class TransportFactory
+class TransportFactory
 {
 
     /**
@@ -27,9 +27,7 @@ final class TransportFactory
      *
      * @param \PhilKra\Helper\Config $config
      *
-     * @throws UnsupportedConnectorTypeException
-     *
-     * @return Connector
+     * @return Connector|TransportInterface
      */
     public static function new(Config $config) : TransportInterface
     {
@@ -41,11 +39,10 @@ final class TransportFactory
         if ($method === 'http') {
             return new Http($config);
         }
-        if(empty($transport['class'])) {
-            throw new \RuntimeException('Invalid transport class for APM');
+        if(empty($transport['client']) || !($transport['client'] instanceof TransportInterface)) {
+            throw new \RuntimeException('Invalid transport client for APM');
         }
-        $transportClass = $transport['class'];
-        return new $transportClass($config);
+        return $transport['client'];
     }
 
 }

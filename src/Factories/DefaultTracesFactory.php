@@ -22,12 +22,12 @@ final class DefaultTracesFactory implements TracesFactory
 {
 
     /**
-     * @var PhilKra\Helper\Config
+     * @var \PhilKra\Helper\Config
      */
     private $config;
 
     /**
-     * @param PhilKra\Helper\Config $config
+     * @param \PhilKra\Helper\Config $config
      */
     public function __construct(Config $config)
     {

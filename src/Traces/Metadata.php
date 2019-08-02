@@ -17,16 +17,16 @@ use PhilKra\Traces\Metadata\User;
 class Metadata implements Trace
 {
 
-    /** @var PhilKra\Traces\Metadata\Process **/
+    /** @var \PhilKra\Traces\Metadata\Process **/
     private $process;
 
-    /** @var PhilKra\Traces\Metadata\Service **/
+    /** @var \PhilKra\Traces\Metadata\Service **/
     private $service;
 
-    /** @var PhilKra\Traces\Metadata\System **/
+    /** @var \PhilKra\Traces\Metadata\System **/
     private $system;
 
-    /** @var PhilKra\Traces\Metadata\User **/
+    /** @var\ PhilKra\Traces\Metadata\User **/
     private $user;
 
     /**
@@ -43,7 +43,7 @@ class Metadata implements Trace
     }
 
     /**
-     * @return PhilKra\Traces\Metadata\Process
+     * @return \PhilKra\Traces\Metadata\Process
      */
     public function getProcess() : Process
     {
@@ -51,7 +51,7 @@ class Metadata implements Trace
     }
 
     /**
-     * @return PhilKra\Traces\Metadata\Service
+     * @return \PhilKra\Traces\Metadata\Service
      */
     public function getService() : Service
     {
@@ -59,7 +59,7 @@ class Metadata implements Trace
     }
 
     /**
-     * @return PhilKra\Traces\Metadata\System
+     * @return \PhilKra\Traces\Metadata\System
      */
     public function getSystem() : System
     {
@@ -67,7 +67,7 @@ class Metadata implements Trace
     }
 
     /**
-     * @return PhilKra\Traces\Metadata\User
+     * @return \PhilKra\Traces\Metadata\User
      */
     public function getUser() : User
     {

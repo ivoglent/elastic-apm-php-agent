@@ -22,13 +22,6 @@ namespace PhilKra\Traces;
 class Transaction extends Event
 {
     /**
-     * How long the transaction took to complete, in ms with 3 decimal points
-     *
-     * @var int
-     */
-    private $duration;
-
-    /**
      * Keyword of specific relevance in the service's domain (eg: 'request', 'backgroundjob', etc)
      *
      * @var string
@@ -150,7 +143,7 @@ class Transaction extends Event
               'name'           => $this->name,
               'type'           => $this->type,
               'timestamp'      => $this->timestamp,
-              'duration'       => $this->getDuration(),
+              'duration'       => $this->duration,
               'sampled'        => $this->sampled,
               'span_count'     => [
                   'started' => 0,

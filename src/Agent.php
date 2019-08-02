@@ -1,5 +1,5 @@
 <?php
-//declare(strict_types=1);
+declare(strict_types=1);
 
 /**
  * This file is part of the PhilKra/elastic-apm-php-agent library
@@ -17,14 +17,11 @@ use PhilKra\Helper\System;
 use PhilKra\Stores\TracesStore;
 use PhilKra\Factories\TracesFactory;
 use PhilKra\Factories\DefaultTracesFactory;
-use PhilKra\Traces\Event;
-use PhilKra\Traces\Metricset;
 use PhilKra\Traces\Trace;
 use PhilKra\Helper\Timer;
 use PhilKra\Helper\Config;
-use PhilKra\Traces\Transaction;
-use PhilKra\Transport\Connector;
 use PhilKra\Transport\TransportFactory;
+use PhilKra\Transport\TransportInterface;
 
 /**
  *
@@ -38,14 +35,14 @@ class Agent
      *
      * @var string
      */
-    public const VERSION = '7.2.0';
+    public const VERSION = '6.5.9-beta';
 
     /**
      * Agent Name
      *
      * @var string
      */
-    public const NAME = 'apm-agent-php';
+    public const NAME = 'php';
 
     /**
      * Config Store
@@ -85,18 +82,25 @@ class Agent
     private $factory;
 
     /**
+     * @var TransportInterface
+     */
+    private $httpClient;
+
+    /**
      * Setup the APM Agent
      *
      * @param array $config
      * @param array $sharedContext Set shared contexts such as user and tags
      *
-     * @return void
      */
 
     public function __construct(array $config, array $sharedContext = [])
     {
         // Init Agent Config
         $this->config = new Config($config);
+
+        // Init http client
+        $this->httpClient = TransportFactory::new($this->config);
 
         // Init the Traces Factory
         $this->factory = new DefaultTracesFactory($this->getConfig());
@@ -168,40 +172,6 @@ class Agent
     }
 
     /**
-     * Register metrics and default metrics which collected some information about CPU and RAM
-     *
-     * @param array $metrics
-     */
-    public function registerMetrics(?array $metrics = []) {
-        /** @var Metricset $metricset */
-        $metricset = $this->factory()->newMetricset();
-        $systemInfo = (new System())->getSystemInfo();
-        if (!empty($metrics)) {
-            $systemInfo = array_merge($systemInfo, $metrics);
-        }
-        if (!empty($systemInfo)) {
-            foreach ($systemInfo as $key => $value) {
-                $metric = new Metricset\Metric($key, $value);
-                $metricset->put($metric);
-            }
-            $this->register($metricset);
-        }
-
-    }
-
-    /**
-     * Get the Data of the Server Information Endpoint
-     *
-     * @link https://www.elastic.co/guide/en/apm/server/6.7/server-info.html
-     *
-     * @return array
-     */
-    public function getServerInfo() : array
-    {
-        // TODO
-    }
-
-    /**
      * Send Data to APM Service
      *
      * @link https://github.com/philkra/elastic-apm-laravel/issues/22
@@ -211,22 +181,13 @@ class Agent
      */
     public function send() : bool
     {
-        // Is the Agent enabled ?
-        if ($this->config->get('active') === false) {
-            $this->errorsStore->reset();
-            $this->transactionsStore->reset();
-            return true;
-        }
-        
-        $status = true;
-        // Commit the Errors
+        $status = false;
         if ($this->traces->isEmpty() === false) {
-            $status = TransportFactory::new($this->config)->send($this->traces);
-            if ($status === true) {
+            $status = $this->httpClient->send($this->traces);
+            if ($status) {
                 $this->traces->reset();
             }
         }
-
         return $status;
     }
 

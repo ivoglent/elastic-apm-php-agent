@@ -22,8 +22,14 @@ use PhilKra\Traces\Metricset\Metric;
 class Metricset extends TimedTrace
 {
 
-    /** @var PhilKra\Traces\Metricset\Sample **/
+    /** @var array **/
     private $samples = [];
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->timestamp = $this->getTimer()->getNow();
+    }
 
     /**
      * Put a Metric to the Set
@@ -44,12 +50,10 @@ class Metricset extends TimedTrace
     {
         $payload = [
           'metricset' => [
-              'timestamp' => $this->getTimer()->getNow(),
+              'timestamp' => $this->timestamp,
               'samples'   => $this->samples,
           ]
       ];
-
-      // TODO -- tags
 
       return $payload;
     }

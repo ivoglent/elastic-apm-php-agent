@@ -1,118 +1,70 @@
 <?php
 namespace PhilKra\Tests;
 
-use \PhilKra\Agent;
-use PhilKra\Stores\ErrorsStore;
-use PhilKra\Stores\TransactionsStore;
-use \PhilKra\Transaction\Summary;
+use PhilKra\Agent;
+use PhilKra\Factories\TracesFactory;
+use PhilKra\Helper\Config;
+use PhilKra\Stores\TracesStore;
+use PhilKra\Traces\Trace;
+use PhilKra\Transport\TransportInterface;
 use PHPUnit\Framework\MockObject\MockObject;
-use Yaoi\Mock;
 
 /**
  * Test Case for @see \PhilKra\Agent
  */
-final class AgentTest extends TestCase {
+class AgentTest extends TestCase {
+    /** @var  Agent */
+    private $agent;
 
-  /**
-   * @covers \PhilKra\Agent::__construct
-   * @covers \PhilKra\Agent::startTransaction
-   * @covers \PhilKra\Agent::stopTransaction
-   * @covers \PhilKra\Agent::getTransaction
-   */
-  public function testStartAndStopATransaction() {
-    $agent = new Agent( [ 'appName' => 'phpunit_1' ] );
+    /** @var  TracesStore|MockObject */
+    private $traceStore;
 
-    // Create a Transaction, wait and Stop it
-    $name = 'trx';
-    $agent->startTransaction( $name );
-    usleep( 10 * 1000 ); // sleep milliseconds
-    $agent->stopTransaction( $name );
+    /** @var  TransportInterface|MockObject */
+    private $transport;
 
-    // Transaction Summary must be populated
-    $summary = $agent->getTransaction( $name )->getSummary();
+    public function setUp()
+    {
+        parent::setUp();
+        $this->agent = new Agent([
+            'name' => 'unit-test',
+            'version' => '1.0'
+        ], [
+            'user' => []
+        ]);
 
-    $this->assertArrayHasKey( 'duration', $summary );
-    $this->assertArrayHasKey( 'backtrace', $summary );
+        $this->traceStore = $this->createMock(TracesStore::class);
+        $reflection = new \ReflectionClass($this->agent);
+        $reflectionProperty = $reflection->getProperty('traces');
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($this->agent, $this->traceStore);
 
-    // Expect duration in milliseconds
-    $this->assertDurationIsWithinThreshold(10, $summary['duration']);
-    $this->assertNotEmpty( $summary['backtrace'] );
-  }
+        $this->transport = $this->createMock(TransportInterface::class);
+        $reflectionProperty = $reflection->getProperty('httpClient');
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($this->agent, $this->transport);
+    }
 
-  /**
-   * @covers \PhilKra\Agent::__construct
-   * @covers \PhilKra\Agent::startTransaction
-   * @covers \PhilKra\Agent::stopTransaction
-   * @covers \PhilKra\Agent::getTransaction
-   */
-  public function testStartAndStopATransactionWithExplicitStart() {
-    $agent = new Agent( [ 'appName' => 'phpunit_1' ] );
+    public function testModifyFactory() {
+        $factory = $this->createMock(TracesFactory::class);
+        $this->agent->setFactory($factory);
+        $this->assertSame($factory, $this->agent->factory());
+    }
 
-    // Create a Transaction, wait and Stop it
-    $name = 'trx';
-    $agent->startTransaction( $name, [], microtime(true) - 1);
-    usleep( 500 * 1000 ); // sleep milliseconds
-    $agent->stopTransaction( $name );
+    public function testGetConfig() {
+        $this->assertInstanceOf(Config::class, $this->agent->getConfig());
+    }
 
-    // Transaction Summary must be populated
-    $summary = $agent->getTransaction( $name )->getSummary();
+    public function testRegister() {
+        $trace = $this->createMock(Trace::class);
+        $this->traceStore->expects(self::once())->method('register')->with($trace);
+        $this->agent->register($trace);
+    }
 
-    $this->assertArrayHasKey( 'duration', $summary );
-    $this->assertArrayHasKey( 'backtrace', $summary );
+    public function testSendWithRegisteredTraces() {
+        $this->traceStore->expects(self::once())->method('isEmpty')->willReturn(false);
+        $this->transport->expects(self::once())->method('send')->willReturn(true);
+        $this->assertTrue($this->agent->send());
+    }
 
-    // Expect duration in milliseconds
-    $this->assertDurationIsWithinThreshold(1500, $summary['duration'], 150);
-    $this->assertNotEmpty( $summary['backtrace'] );
-  }
 
-  /**
-   * @depends testStartAndStopATransaction
-   *
-   * @covers \PhilKra\Agent::__construct
-   * @covers \PhilKra\Agent::getTransaction
-   */
-  public function testForceErrorOnUnknownTransaction() {
-    $agent = new Agent( [ 'appName' => 'phpunit_x' ] );
-
-    $this->expectException( \PhilKra\Exception\Transaction\UnknownTransactionException::class );
-
-    // Let it go boom!
-    $agent->getTransaction( 'unknown' );
-  }
-
-  /**
-   * @depends testForceErrorOnUnknownTransaction
-   * 
-   * @covers \PhilKra\Agent::__construct
-   * @covers \PhilKra\Agent::stopTransaction
-   */
-  public function testForceErrorOnUnstartedTransaction() {
-    $agent = new Agent( [ 'appName' => 'phpunit_2' ] );
-
-    $this->expectException( \PhilKra\Exception\Transaction\UnknownTransactionException::class );
-
-    // Stop an unstarted Transaction and let it go boom!
-    $agent->stopTransaction( 'unknown' );
-  }
-
-  public function testClearErrorStoreOnSendWhenNotActive()
-  {
-      /** @var TransactionsStore|MockObject $transactionStore */
-      $transactionStore = $this->createMock(TransactionsStore::class);
-      /** @var ErrorsStore|MockObject $errorStore */
-      $errorStore = $this->createMock(ErrorsStore::class);
-
-      $agent = new Agent(
-          [ 'appName' => 'phpunit_1', 'active' => false ],
-          [],
-          null,
-          $transactionStore,
-          $errorStore
-      );
-
-      $transactionStore->expects($this->once())->method('reset');
-      $errorStore->expects($this->once())->method('reset');
-
-      $agent->send();
-  }
 }

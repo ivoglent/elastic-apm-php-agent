@@ -14,16 +14,21 @@ class Timer
     /**
      * Starting Timestamp
      *
-     * @var float
+     * @var integer
      */
     private $startedOn = null;
 
     /**
      * Ending Timestamp
      *
-     * @var float
+     * @var integer
      */
     private $stoppedOn = null;
+
+    public function __construct(float $startTime = null)
+    {
+        $this->startedOn = $startTime;
+    }
 
     /**
      * Get the Event's Timestamp Epoch in Micro
@@ -38,6 +43,7 @@ class Timer
     /**
      * Start the Timer
      *
+     * @param float|null $startTime
      * @return void
      * @throws AlreadyRunningException
      */
@@ -70,9 +76,9 @@ class Timer
      *
      * @throws \PhilKra\Exception\Timer\NotStoppedException
      *
-     * @return float
+     * @return int
      */
-    public function getDuration() : float
+    public function getDuration() : int
     {
         if ($this->stoppedOn === null) {
             throw new NotStoppedException();

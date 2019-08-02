@@ -2,8 +2,6 @@
 
 namespace PhilKra\Traces;
 
-use Ramsey\Uuid\Uuid;
-
 /**
  *
  * Event Trace with Timing Context
@@ -51,7 +49,7 @@ class Event extends TimedTrace
      *
      * @link https://github.com/philkra/elastic-apm-php-agent/issues/3
      *
-     * @param array $contexts
+     * @internal param array $contexts
      */
     public function __construct()
     {

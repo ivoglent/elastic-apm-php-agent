@@ -26,13 +26,6 @@ class Span extends Event
 {
 
     /**
-     * Duration of the span in milliseconds
-     *
-     * @var int
-     */
-    private $duration;
-
-    /**
      * Generic designation of a span in the scope of a transaction
      *
      * @var string
@@ -174,7 +167,7 @@ class Span extends Event
               'name'           => $this->name,
               'type'           => $this->type,
               'timestamp'      => $this->timestamp,
-              'duration'       => $this->getDuration(),
+              'duration'       => $this->duration,
               'sync'           => $this->sync,
               'context'        => empty($this->contexts) ? null : $this->contexts,
               'stacktrace'     => $this->stacktrace
