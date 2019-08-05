@@ -72,7 +72,7 @@ Please consult the documentation for your exact needs. Below is an example for a
 $agent = new \PhilKra\Agent($config, $contexts);
 
 //Create new transaction
-$transaction = $this->agent->factory()->newTransaction($transactionName, $transactionType);
+$transaction = $agent->factory()->newTransaction($transactionName, $transactionType);
 //Start current transaction
 $transaction->start();
 
