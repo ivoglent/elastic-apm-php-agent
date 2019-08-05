@@ -19,6 +19,7 @@ use PhilKra\Factories\TracesFactory;
 use PhilKra\Helper\Config;
 use PhilKra\Helper\Timer;
 use PhilKra\Stores\TracesStore;
+use PhilKra\Traces\TimedTrace;
 use PhilKra\Traces\Trace;
 use PhilKra\Transport\TransportFactory;
 use PhilKra\Transport\TransportInterface;
@@ -33,7 +34,7 @@ class Agent
      *
      * @var string
      */
-    public const VERSION = '6.6.0';
+    public const VERSION = '6.6.1';
 
     /**
      * Agent Name
@@ -161,9 +162,18 @@ class Agent
      * Put a Trace in the Registry
      *
      * @param Trace $trace
+     * @throws Exception\Timer\NotStartedException
      */
     public function register(Trace $trace): void
     {
+        if ($trace instanceof TimedTrace) {
+            if ($trace->getDuration() < $this->config->get('minimumSpanDuration', 20)) {
+                return;
+            }
+            if (count($this->traces->list()) > $this->config->get('maximumTransactionSpan', 100)) {
+                return;
+            }
+        }
         $this->traces->register($trace);
     }
 

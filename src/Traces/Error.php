@@ -28,7 +28,7 @@ class Error extends Event
     /**
      * @var
      */
-    private $contex;
+    private $context;
 
     /**
      * Error | Exception
@@ -43,12 +43,12 @@ class Error extends Event
      * @param \Throwable $throwable
      * @param array $contexts
      */
-    public function __construct(\Throwable $throwable, array $contexts = [])
+    public function __construct(\Throwable $throwable, array $contexts = null)
     {
         parent::__construct();
         $this->throwable = $throwable;
         $this->stacktrace = self::mapStacktrace($this->throwable->getTrace());
-        $this->contex = $contexts;
+        $this->context = $contexts;
     }
 
     /**

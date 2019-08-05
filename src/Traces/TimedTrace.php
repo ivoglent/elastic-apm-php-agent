@@ -37,6 +37,7 @@ class TimedTrace implements Trace
     public function __construct()
     {
         $this->timer = new Timer();
+        $this->timestamp = $this->timer->getNow();
     }
 
     /**

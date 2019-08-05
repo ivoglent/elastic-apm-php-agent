@@ -86,6 +86,8 @@ class Config
             'env' => [],
             'cookies' => [],
             'backtraceLimit' => 0,
+            'minimumSpanDuration' => 20,
+            'maximumTransactionSpan' => 100
         ];
     }
 
