@@ -1,8 +1,6 @@
 <?php
 
-
 namespace PhilKra\Traces;
-
 
 class Stacktrace implements Trace
 {
@@ -16,7 +14,7 @@ class Stacktrace implements Trace
     /**
      * Line number
      *
-     * @var integer
+     * @var int
      */
     private $lineno;
 
@@ -41,19 +39,18 @@ class Stacktrace implements Trace
         }
     }
 
-
     /**
      * Serialize Span
      *
      * @return array
      */
-    public function jsonSerialize() : array
+    public function jsonSerialize(): array
     {
         return [
             'filename' => $this->filename,
             'lineno' => $this->lineno,
             'function' => $this->function,
-            'abs_path' => $this->abs_path
+            'abs_path' => $this->abs_path,
         ];
     }
 }

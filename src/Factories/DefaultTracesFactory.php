@@ -6,28 +6,28 @@
  * file that was distributed with this source code.
  *
  * @license http://opensource.org/licenses/MIT MIT
- * @link https://github.com/philkra/elastic-apm-php-agent GitHub
+ * @see https://github.com/philkra/elastic-apm-php-agent GitHub
  */
 
 namespace PhilKra\Factories;
 
+use PhilKra\Helper\Config;
 use PhilKra\Traces\Error;
-use PhilKra\Traces\Span;
-use PhilKra\Traces\Transaction;
 use PhilKra\Traces\Metadata;
 use PhilKra\Traces\Metricset;
-use PhilKra\Helper\Config;
+use PhilKra\Traces\Span;
+use PhilKra\Traces\Transaction;
 
 final class DefaultTracesFactory implements TracesFactory
 {
 
     /**
-     * @var PhilKra\Helper\Config
+     * @var \PhilKra\Helper\Config
      */
     private $config;
 
     /**
-     * @param PhilKra\Helper\Config $config
+     * @param \PhilKra\Helper\Config $config
      */
     public function __construct(Config $config)
     {
@@ -37,7 +37,7 @@ final class DefaultTracesFactory implements TracesFactory
     /**
      * {@inheritdoc}
      */
-    public function newError(\Throwable $throwable) : Error
+    public function newError(\Throwable $throwable): Error
     {
         return new Error($throwable);
     }
@@ -45,7 +45,7 @@ final class DefaultTracesFactory implements TracesFactory
     /**
      * {@inheritdoc}
      */
-    public function newSpan(string $name, string $type, ?string $action = null) : Span
+    public function newSpan(string $name, string $type, ?string $action = null): Span
     {
         return new Span($name, $type, $action);
     }
@@ -53,7 +53,7 @@ final class DefaultTracesFactory implements TracesFactory
     /**
      * {@inheritdoc}
      */
-    public function newTransaction(string $name, string $type) : Transaction
+    public function newTransaction(string $name, string $type): Transaction
     {
         return new Transaction($name, $type);
     }
@@ -61,7 +61,7 @@ final class DefaultTracesFactory implements TracesFactory
     /**
      * {@inheritdoc}
      */
-    public function newMetricset() : Metricset
+    public function newMetricset(): Metricset
     {
         return new Metricset();
     }
@@ -69,9 +69,8 @@ final class DefaultTracesFactory implements TracesFactory
     /**
      * {@inheritdoc}
      */
-    public function newMetadata() : Metadata
+    public function newMetadata(): Metadata
     {
         return new Metadata($this->config);
     }
-
 }

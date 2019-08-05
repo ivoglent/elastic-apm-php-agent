@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  *
  * @license http://opensource.org/licenses/MIT MIT
- * @link https://github.com/philkra/elastic-apm-php-agent GitHub
+ * @see https://github.com/philkra/elastic-apm-php-agent GitHub
  */
 
 namespace PhilKra\Stores;
@@ -16,9 +16,7 @@ use PhilKra\Traces\Span;
 use PhilKra\Traces\Trace;
 
 /**
- *
  * Registry for <b>all</b> captured Events
- *
  */
 class TracesStore implements \JsonSerializable
 {
@@ -34,7 +32,7 @@ class TracesStore implements \JsonSerializable
      *
      * @return array of PhilKra\Traces\Trace
      */
-    public function list() : array
+    public function list(): array
     {
         return $this->store;
     }
@@ -42,13 +40,12 @@ class TracesStore implements \JsonSerializable
     /**
      * Register a Trace
      *
-     * @param Trace
-     *
-     * @return void
+     * @param Trace $t
+     * @internal param $Trace
      */
-    public function register(Trace $t) : void
+    public function register(Trace $t): void
     {
-        $this->store [] = $t;
+        $this->store[] = $t;
     }
 
     /**
@@ -56,15 +53,13 @@ class TracesStore implements \JsonSerializable
      *
      * @return bool
      */
-    public function isEmpty() : bool
+    public function isEmpty(): bool
     {
         return empty($this->store);
     }
 
     /**
      * Empty the Store
-     *
-     * @return void
      */
     public function reset()
     {
@@ -76,7 +71,7 @@ class TracesStore implements \JsonSerializable
      *
      * @return array
      */
-    public function jsonSerialize() : array
+    public function jsonSerialize(): array
     {
         return $this->store;
     }
@@ -88,12 +83,13 @@ class TracesStore implements \JsonSerializable
      *
      * @return string
      */
-    public function toNdJson() : string
+    public function toNdJson(): string
     {
-        return sprintf("%s\n", implode("\n", array_map(function($obj) {
+        return sprintf("%s\n", implode("\n", array_map(function ($obj) {
             if (($obj instanceof Span || $obj instanceof Error) && !empty($obj->getStacktrace())) {
                 return json_encode($obj);
             }
+
             return json_encode($obj, JSON_FORCE_OBJECT);
         }, $this->list())));
     }

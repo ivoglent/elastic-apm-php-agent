@@ -14,23 +14,28 @@ class Timer
     /**
      * Starting Timestamp
      *
-     * @var float
+     * @var int
      */
-    private $startedOn = null;
+    private $startedOn;
 
     /**
      * Ending Timestamp
      *
-     * @var float
+     * @var int
      */
-    private $stoppedOn = null;
+    private $stoppedOn;
+
+    public function __construct(float $startTime = null)
+    {
+        $this->startedOn = $startTime;
+    }
 
     /**
      * Get the Event's Timestamp Epoch in Micro
      *
      * @return int
      */
-    public function getNow() : int
+    public function getNow(): int
     {
         return $this->microSeconds();
     }
@@ -38,27 +43,25 @@ class Timer
     /**
      * Start the Timer
      *
-     * @return void
+     * @param float|null $startTime
      * @throws AlreadyRunningException
      */
-    public function start(float $startTime = null) : void
+    public function start(float $startTime = null): void
     {
         if (null !== $this->startedOn) {
             throw new AlreadyRunningException();
         }
-        $this->startedOn = ($startTime !== null) ? $startTime : $this->milliSeconds();
+        $this->startedOn = (null !== $startTime) ? $startTime : $this->milliSeconds();
     }
 
     /**
      * Stop the Timer
      *
      * @throws \PhilKra\Exception\Timer\NotStartedException
-     *
-     * @return void
      */
-    public function stop() : void
+    public function stop(): void
     {
-        if ($this->startedOn === null) {
+        if (null === $this->startedOn) {
             throw new NotStartedException();
         }
 
@@ -70,13 +73,14 @@ class Timer
      *
      * @throws \PhilKra\Exception\Timer\NotStoppedException
      *
-     * @return float
+     * @return int
      */
-    public function getDuration() : float
+    public function getDuration(): int
     {
-        if ($this->stoppedOn === null) {
+        if (null === $this->stoppedOn) {
             throw new NotStoppedException();
         }
+
         return $this->stoppedOn - $this->startedOn;
     }
 
@@ -87,13 +91,13 @@ class Timer
      *
      * @return float
      */
-    public function getElapsed() : float
+    public function getElapsed(): float
     {
-        if ($this->startedOn === null) {
+        if (null === $this->startedOn) {
             throw new NotStartedException();
         }
 
-        return ($this->stoppedOn === null) ?
+        return (null === $this->stoppedOn) ?
             $this->milliSeconds() - $this->startedOn :
             $this->getDuration();
     }
@@ -101,16 +105,20 @@ class Timer
     /**
      * @return float
      */
-    private function milliSeconds(): float {
+    private function milliSeconds(): float
+    {
         $mt = explode(' ', microtime());
-        return ((float)$mt[1]) * 1000 + ((int)round($mt[0] * 1000));
+
+        return ((float) $mt[1]) * 1000 + ((int) round($mt[0] * 1000));
     }
 
     /**
      * @return int
      */
-    private function microSeconds(): int {
+    private function microSeconds(): int
+    {
         $mt = explode(' ', microtime());
-        return ((int)$mt[1]) * 1000000 + ((int)round($mt[0] * 1000000));
+
+        return ((int) $mt[1]) * 1000000 + ((int) round($mt[0] * 1000000));
     }
 }

@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  *
  * @license http://opensource.org/licenses/MIT MIT
- * @link https://github.com/philkra/elastic-apm-php-agent GitHub
+ * @see https://github.com/philkra/elastic-apm-php-agent GitHub
  */
 
 namespace PhilKra\Traces;
@@ -16,7 +16,7 @@ use PhilKra\Traces\SpanContexts\SpanContext;
 /**
  * APM Error
  *
- * @link https://www.elastic.co/guide/en/apm/server/6.7/span-api.html
+ * @see https://www.elastic.co/guide/en/apm/server/6.7/span-api.html
  * @version 6.7 (v2)
  *
  * "required": ["duration", "name", "type"]
@@ -24,13 +24,6 @@ use PhilKra\Traces\SpanContexts\SpanContext;
  */
 class Span extends Event
 {
-
-    /**
-     * Duration of the span in milliseconds
-     *
-     * @var int
-     */
-    private $duration;
 
     /**
      * Generic designation of a span in the scope of a transaction
@@ -54,7 +47,6 @@ class Span extends Event
      * @var string
      */
     private $type;
-
 
     /**
      * Indicates whether the span was executed synchronously or asynchronously.
@@ -89,7 +81,7 @@ class Span extends Event
      *
      * @var string
      */
-    private $action = null;
+    private $action;
 
     public function __construct(string $name, string $type, string $action = null)
     {
@@ -118,13 +110,13 @@ class Span extends Event
         $this->action = $action;
     }
 
-
     /**
      * Add a SpanContext
      *
      * @param SpanContext $context
+     * @param mixed $type
      */
-    public function addContext($type = 'db', SpanContext $context) : void
+    public function addContext($type = 'db', SpanContext $context): void
     {
         $this->contexts[$type] = $context;
     }
@@ -134,7 +126,8 @@ class Span extends Event
      *
      * @param Stacktrace $stacktrace
      */
-    public function addStacktrace(Stacktrace $stacktrace) {
+    public function addStacktrace(Stacktrace $stacktrace)
+    {
         $this->stacktrace[] = $stacktrace;
     }
 
@@ -143,7 +136,8 @@ class Span extends Event
      *
      * @param Stacktrace[] $stacktrace
      */
-    public function addStacktraces(array $stacktraces) {
+    public function addStacktraces(array $stacktraces)
+    {
         $this->stacktrace = $stacktraces;
     }
 
@@ -152,36 +146,36 @@ class Span extends Event
      *
      * @return mixed
      */
-    public function getStacktrace() {
+    public function getStacktrace()
+    {
         return $this->stacktrace;
     }
-    
+
     /**
      * Serialize Span
      *
      * @return array
      */
-    public function jsonSerialize() : array
+    public function jsonSerialize(): array
     {
         $payload = [
           'span' => [
-              'id'             => $this->getId(),
-              'action'         => $this->action,
+              'id' => $this->getId(),
+              'action' => $this->action,
               'transaction_id' => $this->transaction_id,
-              'trace_id'       => $this->getTraceId(),
-              'start'          => $this->start,
-              'parent_id'      => $this->getParentId(),
-              'name'           => $this->name,
-              'type'           => $this->type,
-              'timestamp'      => $this->timestamp,
-              'duration'       => $this->getDuration(),
-              'sync'           => $this->sync,
-              'context'        => empty($this->contexts) ? null : $this->contexts,
-              'stacktrace'     => $this->stacktrace
-          ]
+              'trace_id' => $this->getTraceId(),
+              'start' => $this->start,
+              'parent_id' => $this->getParentId(),
+              'name' => $this->name,
+              'type' => $this->type,
+              'timestamp' => $this->timestamp,
+              'duration' => $this->duration,
+              'sync' => $this->sync,
+              'context' => empty($this->contexts) ? null : $this->contexts,
+              'stacktrace' => $this->stacktrace,
+          ],
       ];
 
-      return $payload;
+        return $payload;
     }
-
 }

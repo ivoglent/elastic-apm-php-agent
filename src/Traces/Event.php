@@ -2,14 +2,10 @@
 
 namespace PhilKra\Traces;
 
-use Ramsey\Uuid\Uuid;
-
 /**
- *
  * Event Trace with Timing Context
  *
  * e.g. Error, Transaction, Span
- *
  */
 class Event extends TimedTrace
 {
@@ -49,9 +45,9 @@ class Event extends TimedTrace
     /**
      * Init the Event with the Timestamp and UUID
      *
-     * @link https://github.com/philkra/elastic-apm-php-agent/issues/3
+     * @see https://github.com/philkra/elastic-apm-php-agent/issues/3
      *
-     * @param array $contexts
+     * @internal param array $contexts
      */
     public function __construct()
     {
@@ -65,7 +61,7 @@ class Event extends TimedTrace
      *
      * @return string
      */
-    public function getId() : string
+    public function getId(): string
     {
         return $this->id;
     }
@@ -75,7 +71,7 @@ class Event extends TimedTrace
      *
      * @return string
      */
-    public function getTraceId() : string
+    public function getTraceId(): string
     {
         return $this->traceId;
     }
@@ -84,10 +80,8 @@ class Event extends TimedTrace
      * Set the Span's Trace Id
      *
      * @param string $id
-     *
-     * @return void
      */
-    public function setTraceId(string $id) : void
+    public function setTraceId(string $id): void
     {
         $this->traceId = $id;
     }
@@ -97,7 +91,7 @@ class Event extends TimedTrace
      *
      * @return string|null
      */
-    public function getParentId() : ?string
+    public function getParentId(): ?string
     {
         return $this->parentId;
     }
@@ -106,10 +100,8 @@ class Event extends TimedTrace
      * Set the Span's Parent Id
      *
      * @param string $id
-     *
-     * @return void
      */
-    public function setParentId(?string $id) : void
+    public function setParentId(?string $id): void
     {
         $this->parentId = $id;
     }
@@ -121,9 +113,9 @@ class Event extends TimedTrace
      *
      * @return string
      */
-    public function generateId() : string
+    public function generateId(): string
     {
-        return sprintf("%x", mt_rand(1000, 9999));
+        return sprintf('%x', mt_rand(1000, 9999));
     }
 
     /**
@@ -133,9 +125,9 @@ class Event extends TimedTrace
      *
      * @return string
      */
-    public function generateTraceId() : string
+    public function generateTraceId(): string
     {
-        return sprintf("%x", mt_rand(100000000, 999999999));
+        return sprintf('%x', mt_rand(100000000, 999999999));
     }
 
     /**
@@ -143,7 +135,8 @@ class Event extends TimedTrace
      *
      * @param string $id
      */
-    public function setId(string  $id) {
+    public function setId(string  $id)
+    {
         $this->id = $id;
     }
 
@@ -152,7 +145,7 @@ class Event extends TimedTrace
      *
      * @param Transaction $transaction
      */
-    public function setTransaction(Transaction $transaction) : void
+    public function setTransaction(Transaction $transaction): void
     {
         $this->transaction = $transaction;
         $this->transaction_id = $transaction->getId();

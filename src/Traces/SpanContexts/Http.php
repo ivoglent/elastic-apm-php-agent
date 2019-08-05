@@ -6,19 +6,18 @@
  * file that was distributed with this source code.
  *
  * @license http://opensource.org/licenses/MIT MIT
- * @link https://github.com/philkra/elastic-apm-php-agent GitHub
+ * @see https://github.com/philkra/elastic-apm-php-agent GitHub
  */
 
 namespace PhilKra\Traces\SpanContexts;
 
 /**
- *
  * Http Context for a Span
  *
- * @link https://www.elastic.co/guide/en/apm/server/6.7/span-api.html
- *
+ * @see https://www.elastic.co/guide/en/apm/server/6.7/span-api.html
  */
-final class Http extends SpanContext implements \JsonSerializable {
+final class Http extends SpanContext implements \JsonSerializable
+{
 
     /**
      * The raw url of the correlating http request.
@@ -56,7 +55,7 @@ final class Http extends SpanContext implements \JsonSerializable {
     /**
      * @return array
      */
-    public function jsonSerialize() : array
+    public function jsonSerialize(): array
     {
         return [
             'url' => $this->url,
@@ -64,5 +63,4 @@ final class Http extends SpanContext implements \JsonSerializable {
             'method' => $this->method,
         ];
     }
-
 }

@@ -6,17 +6,15 @@
  * file that was distributed with this source code.
  *
  * @license http://opensource.org/licenses/MIT MIT
- * @link https://github.com/philkra/elastic-apm-php-agent GitHub
+ * @see https://github.com/philkra/elastic-apm-php-agent GitHub
  */
 
 namespace PhilKra\Traces\Metricset;
 
-use PhilKra\Traces\Trace;
-
 /**
  * APM Metric Object
  *
- * @link https://www.elastic.co/guide/en/apm/server/6.7/metricset-api.html#metricset-schema
+ * @see https://www.elastic.co/guide/en/apm/server/6.7/metricset-api.html#metricset-schema
  * @version 6.7 (v2)
  */
 class Metric
@@ -34,14 +32,14 @@ class Metric
      */
     public function __construct(string $name, int $value)
     {
-        $this->name  = trim($name);
+        $this->name = trim($name);
         $this->value = $value;
     }
 
     /**
      * @return string
      */
-    public function getName() : string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -49,9 +47,8 @@ class Metric
     /**
      * @return int
      */
-    public function getValue() : int
+    public function getValue(): int
     {
         return $this->value;
     }
-
 }
