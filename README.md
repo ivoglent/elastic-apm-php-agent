@@ -29,187 +29,84 @@ require 'vendor/autoload.php';
 
 ### Initialize the Agent with minimal Config
 ```php
-$agent = new \PhilKra\Agent( [ 'appName' => 'demo' ] );
-```
-When creating the agent, you can directly inject shared contexts such as user, tags and custom.
-```php
-$agent = new \PhilKra\Agent( [ 'appName' => 'with-custom-context' ], [
-  'user' => [
-    'id'    => 12345,
-    'email' => 'email@acme.com',
-  ],
-  'tags' => [
-    // ... more key-values
-  ],
-  'custom' => [
-    // ... more key-values
-  ]
-] );
+$config = [
+    'name' => 'Service Name',
+    'secretToken' => 'APM api token',
+    'transport' => [
+        'host' => 'APM server host',
+        'config' => [
+            'base_uri' => 'base URL to APM server',
+        ],
+    ],
+    'framework' => [
+        'name' => 'Framework Name',
+        'version' => 'Framework version',
+    ]
+];
+$contexts = [
+    'user' => [
+        'id' => 'USER_ID',
+        'username' => 'USER_NAME',
+        'email' => 'EMAIL'
+    ]
+];
+$agent = new \PhilKra\Agent($config, $contexts);
+
 ```
 
 ### Capture Errors and Exceptions
 The agent can capture all types or errors and exceptions that are implemented from the interface `Throwable` (http://php.net/manual/en/class.throwable.php).
 ```php
-$agent->captureThrowable( new Exception() );
+$error = $agent->factory()->newError(new \Exception());
+$error->setTransaction($transaction);
+$error->setParentId($transaction->getId());
+$agent->register($error);
 ```
 
-### Adding spans
+### Usage of transaction and spans
 Addings spans (https://www.elastic.co/guide/en/apm/server/current/transactions.html#transaction-spans) is easy.
 Please consult the documentation for your exact needs. Below is an example for adding a MySQL span.
 
 ```php
-$trxName = 'GET /some/transaction/name';
+//Create APM agent
+$agent = new \PhilKra\Agent($config, $contexts);
 
-// create the agent
-$agent = new \PhilKra\Agent(['appName' => 'Demo with Spans']);
+//Create new transaction
+$transaction = $this->agent->factory()->newTransaction($transactionName, $transactionType);
+//Start current transaction
+$transaction->start();
 
-// start a new transaction
-$transaction = $agent->startTransaction($trxName);
+//Create new span
+$span = $agent->factory()->newSpan($spanName, $spanType, $spanAction);
+$span->setTransaction($transaction);
+$span->setParentId($transaction->getId());
 
-// create a span
-$spans = [];
-$spans[] = [
-  'name' => 'Your Span Name. eg: ORM Query',
-  'type' => 'db.mysql.query',
-  'start' => 300, // when did tht query start, relative to the transaction start, in milliseconds
-  'duration' => 23, // duration, in milliseconds
-  'stacktrace' => [
-    [
-      'function' => "\\YourOrMe\\Library\\Class::methodCall()",
-      'abs_path' => '/full/path/to/file.php',
-      'filename' => 'file.php',
-      'lineno' => 30,
-      'library_frame' => false, // indicated whether this code is 'owned' by an (external) library or not
-      'vars' => [
-        'arg1' => 'value',
-        'arg2' => 'value2',
-      ],
-      'pre_context' => [ // lines of code leading to the context line
-        '<?php',
-        '',
-        '// executing query below',
-      ],
-      'context_line' => '$result = mysql_query("select * from non_existing_table")', // source code of context line
-      'post_context' => [// lines of code after to the context line
-        '',
-        '$table = $fakeTableBuilder->buildWithResult($result);',
-        'return $table;',
-      ],
-    ],
-  ],
-  'context' => [
-    'db' => [
-      'instance' => 'my_database', // the database name
-      'statement' => 'select * from non_existing_table', // the query being executed
-      'type' => 'sql',
-      'user' => 'root', // the user executing the query (don't use root!)
-    ],
-  ],
-];
+//Start span
+$span->start();
 
-// add the array of spans to the transaction
-$transaction->setSpans($spans);
+//Add sql context to span
+$context = new \PhilKra\Traces\SpanContexts\SpanContext();
+$context->statement = 'SQL Query String';
+$trace->addContext('db', $context);
 
-// Do some stuff you want to watch ...
-sleep(1);
 
-$agent->stopTransaction($trxName);
+//Stop span
+$span->stop();
 
-// send our transactions to te apm
+//Register span to agent
+$agent->register($span);
+
+
+//Stop transaction
+$transaction->stop();
+
+//Register transaction to agent
+$agent->register($transaction);
+
+//Send all data to APM server
 $agent->send();
 ```
 
-### Transaction without minimal Meta data and Context
-```php
-$trxName = 'Demo Simple Transaction';
-$agent->startTransaction( $trxName );
-// Do some stuff you want to watch ...
-$agent->stopTransaction( $trxName );
-```
-
-### Transaction with Meta data and Contexts
-```php
-$trxName = 'Demo Transaction with more Data';
-$agent->startTransaction( $trxName );
-// Do some stuff you want to watch ...
-$agent->stopTransaction( $trxName, [
-    'result' => '200',
-    'type'   => 'demo'
-] );
-$agent->getTransaction( $trxName )->setUserContext( [
-    'id'    => 12345,
-    'email' => "hello@acme.com",
- ] );
- $agent->getTransaction( $trxName )->setCustomContext( [
-    'foo' => 'bar',
-    'bar' => [ 'foo1' => 'bar1', 'foo2' => 'bar2' ]
-] );
-$agent->getTransaction( $trxName )->setTags( [ 'k1' => 'v1', 'k2' => 'v2' ] );  
-```
-
-### Example of a Transaction
-This example illustrates how you can monitor a call to another web service.
-```php
-$agent = new \PhilKra\Agent( [ 'appName' => 'example' ] );
-
-$endpoint = 'https://acme.com/api/';
-$payload  = [ 'foo' => 'bar' ];
-$trxName  = sprintf('POST %s', $endpoint);
-$client   = new GuzzleHttp\Client();
-
-// Start the Transaction
-$agent->startTransaction( $trxName );
-
-// Do the call via curl/Guzzle e.g.
-$response = $client->request('POST', $endpoint, [
-    'json' => $payload
-]);
-
-// Stop the Transaction tracing, attach the Status and the sent Payload
-$agent->stopTransaction( $trxName, [
-    'status'  => $response->getStatusCode(),
-    'payload' => $payload,
-] );
-
-// Send the collected Traces to the APM server
-$agent->send();
-```
-
-### Configuration
-```
-appName       : Name of this application, Required
-appVersion    : Application version, Default: ''
-serverUrl     : APM Server Endpoint, Default: 'http://127.0.0.1:8200'
-secretToken   : Secret token for APM Server, Default: null
-hostname      : Hostname to transmit to the APM Server, Default: gethostname()
-active        : Activate the APM Agent, Default: true
-timeout       : Guzzle Client timeout, Default: 5
-apmVersion    : APM Server Intake API version, Default: 'v1'
-env           : $_SERVER vars to send to the APM Server, empty set sends all. Keys are case sensitive, Default: []
-cookies       : Cookies to send to the APM Server, empty set sends all. Keys are case sensitive, Default: []
-httpClient    : Extended GuzzleHttp\Client Default: []
-backtraceLimit: Depth of a transaction backtrace, Default: unlimited
-```
-
-Detailed `GuzzleHttp\Client` options can be found [here](http://docs.guzzlephp.org/en/stable/request-options.html#request-options).
-
-#### Example of an extended Configuration
-```php
-$config = [
-    'appName'     => 'My WebApp',
-    'appVersion'  => '1.0.42',
-    'serverUrl'   => 'http://apm-server.example.com',
-    'secretToken' => 'DKKbdsupZWEEzYd4LX34TyHF36vDKRJP',
-    'hostname'    => 'node-24.app.network.com',
-    'env'         => ['DOCUMENT_ROOT', 'REMOTE_ADDR'],
-    'cookies'     => ['my-cookie'],
-    'httpClient'  => [
-        'verify' => false,
-        'proxy'  => 'tcp://localhost:8125'
-    ],
-];
-$agent = new \PhilKra\Agent($config);
-```
 
 ## Tests
 ```bash
