@@ -62,8 +62,8 @@ class AgentTest extends TestCase {
 
     public function testSendWithRegisteredTraces() {
         $this->traceStore->expects(self::once())->method('isEmpty')->willReturn(false);
-        $this->transport->expects(self::once())->method('send')->willReturn(true);
-        $this->assertTrue($this->agent->send());
+        $this->traceStore->expects(self::once())->method('reset');
+        $this->agent->send();
     }
 
 

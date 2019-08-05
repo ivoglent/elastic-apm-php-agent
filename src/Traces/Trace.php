@@ -6,17 +6,14 @@
  * file that was distributed with this source code.
  *
  * @license http://opensource.org/licenses/MIT MIT
- * @link https://github.com/philkra/elastic-apm-php-agent GitHub
+ * @see https://github.com/philkra/elastic-apm-php-agent GitHub
  */
 
 namespace PhilKra\Traces;
 
 /**
- *
  * Base Trace
- *
  */
 interface Trace extends \JsonSerializable
 {
-
 }

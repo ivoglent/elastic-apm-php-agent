@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /**
@@ -8,25 +9,22 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  *
  * @license http://opensource.org/licenses/MIT MIT
- * @link https://github.com/philkra/elastic-apm-php-agent GitHub
+ * @see https://github.com/philkra/elastic-apm-php-agent GitHub
  */
 
 namespace PhilKra;
 
-use PhilKra\Helper\System;
-use PhilKra\Stores\TracesStore;
-use PhilKra\Factories\TracesFactory;
 use PhilKra\Factories\DefaultTracesFactory;
-use PhilKra\Traces\Trace;
-use PhilKra\Helper\Timer;
+use PhilKra\Factories\TracesFactory;
 use PhilKra\Helper\Config;
+use PhilKra\Helper\Timer;
+use PhilKra\Stores\TracesStore;
+use PhilKra\Traces\Trace;
 use PhilKra\Transport\TransportFactory;
 use PhilKra\Transport\TransportInterface;
 
 /**
- *
  * APM Agent
- *
  */
 class Agent
 {
@@ -47,7 +45,7 @@ class Agent
     /**
      * Config Store
      *
-     * @var \PhilKra\Helper\Config
+     * @var Config
      */
     private $config;
 
@@ -71,9 +69,9 @@ class Agent
      * @var array
      */
     private $sharedContext = [
-      'user'   => [],
+      'user' => [],
       'custom' => [],
-      'tags'   => []
+      'tags' => [],
     ];
 
     /**
@@ -91,9 +89,9 @@ class Agent
      *
      * @param array $config
      * @param array $sharedContext Set shared contexts such as user and tags
-     *
+     * @throws Exception\InvalidConfigException
+     * @throws Exception\Timer\AlreadyRunningException
      */
-
     public function __construct(array $config, array $sharedContext = [])
     {
         // Init Agent Config
@@ -115,7 +113,7 @@ class Agent
 
         // Init the Shared Context
         $this->sharedContext['custom'] = $sharedContext['custom'] ?? [];
-        $this->sharedContext['tags']   = $sharedContext['tags'] ?? [];
+        $this->sharedContext['tags'] = $sharedContext['tags'] ?? [];
 
         // Let's misuse the context to pass the environment variable and cookies
         // config to the EventBeans and the getContext method
@@ -123,7 +121,7 @@ class Agent
         // @see https://github.com/philkra/elastic-apm-php-agent/issues/30
         $this->sharedContext['env'] = $this->config->get('env', []);
         $this->sharedContext['cookies'] = $this->config->get('cookies', []);
-        
+
         // Start Global Agent Timer
         $this->timer = new Timer();
         $this->timer->start();
@@ -144,7 +142,7 @@ class Agent
      *
      * @return TracesFactory
      */
-    public function factory() : TracesFactory
+    public function factory(): TracesFactory
     {
         return $this->factory;
     }
@@ -152,9 +150,9 @@ class Agent
     /**
      * Get the Agent Config
      *
-     * @return \PhilKra\Helper\Config
+     * @return Config
      */
-    public function getConfig() : \PhilKra\Helper\Config
+    public function getConfig(): Config
     {
         return $this->config;
     }
@@ -163,10 +161,8 @@ class Agent
      * Put a Trace in the Registry
      *
      * @param Trace $trace
-     *
-     * @return void
      */
-    public function register(Trace $trace) : void
+    public function register(Trace $trace): void
     {
         $this->traces->register($trace);
     }
@@ -174,21 +170,15 @@ class Agent
     /**
      * Send Data to APM Service
      *
-     * @link https://github.com/philkra/elastic-apm-laravel/issues/22
-     * @link https://github.com/philkra/elastic-apm-laravel/issues/26
+     * @see https://github.com/philkra/elastic-apm-laravel/issues/22
+     * @see https://github.com/philkra/elastic-apm-laravel/issues/26
      *
-     * @return bool
      */
-    public function send() : bool
+    public function send()
     {
-        $status = false;
-        if ($this->traces->isEmpty() === false) {
-            $status = $this->httpClient->send($this->traces);
-            if ($status) {
-                $this->traces->reset();
-            }
+        if (false === $this->traces->isEmpty()) {
+            $this->httpClient->send($this->traces);
+            $this->traces->reset();
         }
-        return $status;
     }
-
 }

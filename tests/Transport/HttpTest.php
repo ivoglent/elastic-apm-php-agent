@@ -9,6 +9,7 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Response;
 use PhilKra\Helper\Config;
 use PhilKra\Stores\TracesStore;
+use PhilKra\Transport\Curl;
 use PhilKra\Transport\Http;
 use PHPUnit\Framework\TestCase;
 
@@ -26,30 +27,16 @@ class HttpTest extends TestCase
         $this->http = new Http($config);
     }
 
-    public function testCreateHttpClient() {
-        $reflection = new \ReflectionClass($this->http);
-        $reflectionProperty = $reflection->getProperty('client');
-        $reflectionProperty->setAccessible(true);
-        $this->assertInstanceOf(ClientInterface::class, $reflectionProperty->getValue($this->http));
-    }
-
-    public function testCreateHttpClientWithExisted() {
-        $client = $this->createMock(Client::class);
-        $config = $this->createMock(Config::class);
-        $this->http = new Http($config, $client);
-        $reflection = new \ReflectionClass($this->http);
-        $reflectionProperty = $reflection->getProperty('client');
-        $reflectionProperty->setAccessible(true);
-        $this->assertSame($client, $reflectionProperty->getValue($this->http));
-    }
-
     public function testSend() {
-        $client = $this->createMock(Client::class);
-        $client->expects(self::once())->method('send')->willReturn($this->createMock(Response::class));
+        $client = $this->createMock(Curl::class);
         $reflection = new \ReflectionClass($this->http);
-        $reflectionProperty = $reflection->getProperty('client');
+        $reflectionProperty = $reflection->getProperty('curl');
         $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($this->http, $client);
+
+        $client->expects(self::exactly(8))->method('setOption');
+        $client->expects(self::once())->method('execute');
+        $client->expects(self::once())->method('close');
 
         $tracesStore = $this->createMock(TracesStore::class);
         $tracesStore->expects(self::once())->method('toNdJson')->willReturn('testData');

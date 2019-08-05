@@ -6,18 +6,15 @@
  * file that was distributed with this source code.
  *
  * @license http://opensource.org/licenses/MIT MIT
- * @link https://github.com/philkra/elastic-apm-php-agent GitHub
+ * @see https://github.com/philkra/elastic-apm-php-agent GitHub
  */
 
 namespace PhilKra\Transport;
 
 use PhilKra\Helper\Config;
-use PhilKra\Exception\Transport\UnsupportedConnectorTypeException;
 
 /**
- *
  * Connector Factory for the creation of the Agent to Server Connection
- *
  */
 class TransportFactory
 {
@@ -27,22 +24,22 @@ class TransportFactory
      *
      * @param \PhilKra\Helper\Config $config
      *
-     * @return Connector|TransportInterface
+     * @return TransportInterface
      */
-    public static function new(Config $config) : TransportInterface
+    public static function new(Config $config): TransportInterface
     {
         // Read the Config
         $transport = $config->get('transport');
-        $method    = mb_strtolower($transport['method']);
+        $method = strtolower($transport['method']);
 
         // Http Transport Handler
-        if ($method === 'http') {
+        if ('http' === $method) {
             return new Http($config);
         }
-        if(empty($transport['client']) || !($transport['client'] instanceof TransportInterface)) {
+        if (empty($transport['client']) || !($transport['client'] instanceof TransportInterface)) {
             throw new \RuntimeException('Invalid transport client for APM');
         }
+
         return $transport['client'];
     }
-
 }

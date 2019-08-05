@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  *
  * @license http://opensource.org/licenses/MIT MIT
- * @link https://github.com/philkra/elastic-apm-php-agent GitHub
+ * @see https://github.com/philkra/elastic-apm-php-agent GitHub
  */
 
 namespace PhilKra\Traces\Metadata;
@@ -16,25 +16,25 @@ use PhilKra\Traces\Trace;
 /**
  * APM Metadata
  *
- * @link https://www.elastic.co/guide/en/apm/server/6.7/metadata-api.html#metadata-user-schema
+ * @see https://www.elastic.co/guide/en/apm/server/6.7/metadata-api.html#metadata-user-schema
  * @version 6.7 (v2)
  */
 class User implements Trace
 {
 
-    /** @var string **/
-    private $id = null;
+    /** @var string * */
+    private $id;
 
-    /** @var string **/
-    private $username = null;
+    /** @var string * */
+    private $username;
 
-    /** @var string **/
-    private $email = null;
+    /** @var string * */
+    private $email;
 
     /**
      * @param string $id
      */
-    public function setId(string $id) : void
+    public function setId(string $id): void
     {
         $this->id = $id;
     }
@@ -42,7 +42,7 @@ class User implements Trace
     /**
      * @param string $username
      */
-    public function setUsername(string $username) : void
+    public function setUsername(string $username): void
     {
         $this->username = $username;
     }
@@ -50,7 +50,7 @@ class User implements Trace
     /**
      * @param string $email
      */
-    public function setEmail(string $email) : void
+    public function setEmail(string $email): void
     {
         $this->email = $email;
     }
@@ -60,19 +60,17 @@ class User implements Trace
      *
      * @return bool
      */
-    public function isSet() : bool
+    public function isSet(): bool
     {
-        return ($this->id !== null || $this->username !== null || $this->email !== null);
+        return null !== $this->id || null !== $this->username || null !== $this->email;
     }
 
     /**
      * Initialize the Object from an Array set
      *
      * @param array $arr
-     *
-     * @return void
      */
-    public function initFromArray(?array $arr) : void
+    public function initFromArray(?array $arr): void
     {
         $this->id = ($arr['id']) ?? null;
         $this->username = ($arr['username']) ?? null;
@@ -84,20 +82,19 @@ class User implements Trace
      *
      * @return array
      */
-    public function jsonSerialize() : array
+    public function jsonSerialize(): array
     {
         $payload = [];
-        if($this->id !== null) {
-            $payload['id'] = (string)$this->id;
+        if (null !== $this->id) {
+            $payload['id'] = (string) $this->id;
         }
-        if($this->username !== null) {
+        if (null !== $this->username) {
             $payload['username'] = $this->username;
         }
-        if($this->email !== null) {
+        if (null !== $this->email) {
             $payload['email'] = $this->email;
         }
 
         return $payload;
     }
-
 }

@@ -14,10 +14,12 @@ use PHPUnit\Framework\TestCase;
 class TransportFactoryTest extends TestCase
 {
     public function testFactoryWithGuzzleClient() {
+        $configMap = [
+            ['transport', null, ['method' =>'http']],
+            ['transport.host', null, 'http://localhost'],
+        ];
         $config = $this->createMock(Config::class);
-        $config->expects(self::atLeastOnce())->method('get')->willReturn([
-            'method' => 'http'
-        ]);
+        $config->expects(self::atLeastOnce())->method('get')->willReturnMap($configMap);
         $result = TransportFactory::new($config);
         $this->assertInstanceOf(Http::class, $result);
     }

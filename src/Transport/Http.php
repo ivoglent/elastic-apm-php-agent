@@ -6,73 +6,59 @@
  * file that was distributed with this source code.
  *
  * @license http://opensource.org/licenses/MIT MIT
- * @link https://github.com/philkra/elastic-apm-php-agent GitHub
+ * @see https://github.com/philkra/elastic-apm-php-agent GitHub
  */
 
 namespace PhilKra\Transport;
 
 use PhilKra\Agent;
-use \PhilKra\Helper\Config;
+use PhilKra\Helper\Config;
 use PhilKra\Stores\TracesStore;
-use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Client;
-use Psr\Log\LoggerInterface;
 
 /**
- *
  * Http Connector to the APM Server Endpoints
- *
  */
-class Http extends Connector
+class Http implements TransportInterface
 {
+    /**
+     * @var Config
+     */
+    private $config;
+
+    /** @var Curl */
+    private $curl;
 
     /**
-     * @var \GuzzleHttp\Client
+     * @param Config $config
      */
-    private $client;
-
-    /**
-     * @param \PhilKra\Helper\Config $config
-     * @param Client|null $client
-     */
-    public function __construct(Config $config, Client $client = null)
+    public function __construct(Config $config)
     {
-        parent::__construct($config);
         $this->config = $config;
-        $this->client = $client;
-
-        $this->configureHttpClient();
-    }
-
-    /**
-     * Create and configure the HTTP client
-     *
-     * @return void
-     */
-    private function configureHttpClient()
-    {
-        if (null !== $this->client) {
-            return;
-        }
-        $config = $this->config->get('transport.config');
-        $this->client = new Client($config ?? []);
+        $endpoint = sprintf('%s/intake/v2/events', $this->config->get('transport.host'));
+        $this->curl = new Curl($endpoint);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function send(TracesStore $store) : bool
+    public function send(TracesStore $store)
     {
-        $endpoint = sprintf('%s/intake/v2/events', $this->config->get('transport.host'));
         $data = $store->toNdJson();
-        $request = new Request(
-            'POST',
-            $endpoint,
-            $this->getRequestHeaders(),
-            $data
-        );
-        $response = $this->client->send($request);
-        return ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300);
+
+        $this->curl->setOption(CURLOPT_RETURNTRANSFER, true);
+        $this->curl->setOption(CURLOPT_HEADER, false);
+        $this->curl->setOption(CURLOPT_NOSIGNAL, 1);
+        $this->curl->setOption(CURLOPT_TIMEOUT_MS, 10);
+        $this->curl->setOption(CURLINFO_HEADER_OUT, true);
+        $this->curl->setOption(CURLOPT_POST, true);
+        $this->curl->setOption(CURLOPT_POSTFIELDS, $data);
+
+        $headers = $this->getRequestHeaders();
+        $headers[] = 'Content-Length: '.strlen($data);
+
+        $this->curl->setOption(CURLOPT_HTTPHEADER, $headers);
+        $this->curl->execute();
+        $this->curl->close();
     }
 
     /**
@@ -80,20 +66,19 @@ class Http extends Connector
      *
      * @return array
      */
-    private function getRequestHeaders() : array
+    private function getRequestHeaders(): array
     {
         // Default Headers Set
         $headers = [
-            'Content-Type' => 'application/x-ndjson',
-            'User-Agent'   => sprintf('apm-agent-php/%s', Agent::VERSION),
+            'Content-Type: application/x-ndjson',
+            'User-Agent:'.sprintf('apm-agent-php/%s', Agent::VERSION),
         ];
 
         // Add Secret Token to Header
-        if ($this->config->get('secretToken') !== null) {
-            $headers['Authorization'] = sprintf('Bearer %s', $this->config->get('secretToken'));
+        if (null !== $this->config->get('secretToken')) {
+            $headers[] = 'Authorization: '.sprintf('Bearer %s', $this->config->get('secretToken'));
         }
 
         return $headers;
     }
-
 }

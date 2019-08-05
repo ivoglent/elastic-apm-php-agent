@@ -11,19 +11,19 @@ use PhilKra\Traces\Metadata\User;
 /**
  * APM Metadata
  *
- * @link https://www.elastic.co/guide/en/apm/server/6.7/metadata-api.html
+ * @see https://www.elastic.co/guide/en/apm/server/6.7/metadata-api.html
  * @version 6.7 (v2)
  */
 class Metadata implements Trace
 {
 
-    /** @var \PhilKra\Traces\Metadata\Process **/
+    /** @var \PhilKra\Traces\Metadata\Process * */
     private $process;
 
-    /** @var \PhilKra\Traces\Metadata\Service **/
+    /** @var \PhilKra\Traces\Metadata\Service * */
     private $service;
 
-    /** @var \PhilKra\Traces\Metadata\System **/
+    /** @var \PhilKra\Traces\Metadata\System * */
     private $system;
 
     /** @var\ PhilKra\Traces\Metadata\User **/
@@ -37,15 +37,15 @@ class Metadata implements Trace
     public function __construct(Config $config)
     {
         $this->process = new Process();
-        $this->system  = new System($config);
+        $this->system = new System($config);
         $this->service = new Service($config);
-        $this->user    = new User();
+        $this->user = new User();
     }
 
     /**
      * @return \PhilKra\Traces\Metadata\Process
      */
-    public function getProcess() : Process
+    public function getProcess(): Process
     {
         return $this->process;
     }
@@ -53,7 +53,7 @@ class Metadata implements Trace
     /**
      * @return \PhilKra\Traces\Metadata\Service
      */
-    public function getService() : Service
+    public function getService(): Service
     {
         return $this->service;
     }
@@ -61,7 +61,7 @@ class Metadata implements Trace
     /**
      * @return \PhilKra\Traces\Metadata\System
      */
-    public function getSystem() : System
+    public function getSystem(): System
     {
         return $this->system;
     }
@@ -69,7 +69,7 @@ class Metadata implements Trace
     /**
      * @return \PhilKra\Traces\Metadata\User
      */
-    public function getUser() : User
+    public function getUser(): User
     {
         return $this->user;
     }
@@ -79,21 +79,20 @@ class Metadata implements Trace
      *
      * @return array
      */
-    public function jsonSerialize() : array
+    public function jsonSerialize(): array
     {
         $payload = [
           'metadata' => [
               'process' => $this->process,
-              'system'  => $this->system,
+              'system' => $this->system,
               'service' => $this->service,
-          ]
+          ],
       ];
 
-      if($this->user->isSet() === true) {
-          $payload['metadata']['user'] = $this->user;
-      }
+        if (true === $this->user->isSet()) {
+            $payload['metadata']['user'] = $this->user;
+        }
 
-      return $payload;
+        return $payload;
     }
-
 }

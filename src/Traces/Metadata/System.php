@@ -2,13 +2,13 @@
 
 namespace PhilKra\Traces\Metadata;
 
-use PhilKra\Traces\Trace;
 use PhilKra\Helper\Config;
+use PhilKra\Traces\Trace;
 
 /**
  * APM Metadata
  *
- * @link https://www.elastic.co/guide/en/apm/server/6.7/metadata-api.html#metadata-system-schema
+ * @see https://www.elastic.co/guide/en/apm/server/6.7/metadata-api.html#metadata-system-schema
  * @version 6.7 (v2)
  */
 final class System implements Trace
@@ -27,16 +27,15 @@ final class System implements Trace
         $this->config = $config;
     }
 
-   /**
-    * @{inheritDoc}
-    */
-   public function jsonSerialize() : array
-   {
-       return [
-           'hostname'     => $this->config->get('hostname'),
+    /**
+     * {@inheritdoc}
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+           'hostname' => $this->config->get('hostname'),
            'architecture' => php_uname('m'),
-           'platform'     => php_uname('s')
+           'platform' => php_uname('s'),
        ];
-   }
-
+    }
 }

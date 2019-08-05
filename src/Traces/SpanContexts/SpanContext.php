@@ -6,18 +6,16 @@
  * file that was distributed with this source code.
  *
  * @license http://opensource.org/licenses/MIT MIT
- * @link https://github.com/philkra/elastic-apm-php-agent GitHub
+ * @see https://github.com/philkra/elastic-apm-php-agent GitHub
  */
 
 namespace PhilKra\Traces\SpanContexts;
 
 /**
- *
  * Base Span Context
  *
- * @link https://www.elastic.co/guide/en/apm/server/6.7/span-api.html
- *
+ * @see https://www.elastic.co/guide/en/apm/server/6.7/span-api.html
  */
-class SpanContext extends \StdClass{
-
+class SpanContext extends \StdClass
+{
 }

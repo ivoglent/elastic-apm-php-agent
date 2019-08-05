@@ -6,17 +6,17 @@
  * file that was distributed with this source code.
  *
  * @license http://opensource.org/licenses/MIT MIT
- * @link https://github.com/philkra/elastic-apm-php-agent GitHub
+ * @see https://github.com/philkra/elastic-apm-php-agent GitHub
  */
 
 namespace PhilKra\Traces;
 
+use PhilKra\Exception\Timer\AlreadyRunningException;
+use PhilKra\Exception\Timer\NotStartedException;
 use PhilKra\Helper\Timer;
 
 /**
- *
  * Trace with Timing Context
- *
  */
 class TimedTrace implements Trace
 {
@@ -28,7 +28,7 @@ class TimedTrace implements Trace
      */
     private $timer;
 
-    /** @var  float */
+    /** @var float */
     protected $duration;
 
     /**
@@ -43,8 +43,9 @@ class TimedTrace implements Trace
      * Start the Event Time (at microtime X)
      *
      * @param float|null $initAt
+     * @throws AlreadyRunningException
      */
-    public function start(?float $initAt = null) : void
+    public function start(?float $initAt = null): void
     {
         $this->timer->start($initAt);
         $this->timestamp = $this->timer->getNow();
@@ -53,7 +54,7 @@ class TimedTrace implements Trace
     /**
      * Stop the Timer
      */
-    public function stop() : void
+    public function stop(): void
     {
         $this->timer->stop();
         $this->duration = $this->getDuration();
@@ -63,8 +64,9 @@ class TimedTrace implements Trace
      * Get the Duration
      *
      * @return float
+     * @throws NotStartedException
      */
-    public function getDuration() : float
+    public function getDuration(): float
     {
         return $this->timer->getElapsed();
     }
@@ -72,17 +74,16 @@ class TimedTrace implements Trace
     /**
      * @return Timer
      */
-    protected function getTimer() : Timer
+    protected function getTimer(): Timer
     {
         return $this->timer;
     }
 
     /**
-     * @{inheritDoc}
+     * {@inheritdoc}
      */
-    public function jsonSerialize() : array
+    public function jsonSerialize(): array
     {
         return [];
     }
-
 }

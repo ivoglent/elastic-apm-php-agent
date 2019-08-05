@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  *
  * @license http://opensource.org/licenses/MIT MIT
- * @link https://github.com/philkra/elastic-apm-php-agent GitHub
+ * @see https://github.com/philkra/elastic-apm-php-agent GitHub
  */
 
 namespace PhilKra\Helper;
@@ -14,9 +14,7 @@ namespace PhilKra\Helper;
 use PhilKra\Exception\InvalidConfigException;
 
 /**
- *
  * Agent Config Store
- *
  */
 class Config
 {
@@ -34,7 +32,7 @@ class Config
      */
     public function __construct(array $config)
     {
-        if (isset($config['name']) === false) {
+        if (false === isset($config['name'])) {
             throw new InvalidConfigException();
         }
 
@@ -59,7 +57,7 @@ class Config
      *
      * @return array
      */
-    public function asArray() : array
+    public function asArray(): array
     {
         return $this->config;
     }
@@ -67,26 +65,26 @@ class Config
     /**
      * Get the Default Config of the Agent
      *
-     * @link https://github.com/philkra/elastic-apm-php-agent/issues/55
+     * @see https://github.com/philkra/elastic-apm-php-agent/issues/55
      *
      * @return array
      */
-    private function getDefaultConfig() : array
+    private function getDefaultConfig(): array
     {
         return [
-            'transport'      => [
+            'transport' => [
                 'method' => 'http',
-                'host'   => 'http://127.0.0.1:8200',
+                'host' => 'http://127.0.0.1:8200',
                 'config' => [
                     'timeout' => 5,
                 ],
             ],
-            'secretToken'    => null,
-            'hostname'       => gethostname(),
-            'active'         => true,
-            'environment'    => 'development',
-            'env'            => [],
-            'cookies'        => [],
+            'secretToken' => null,
+            'hostname' => gethostname(),
+            'active' => true,
+            'environment' => 'development',
+            'env' => [],
+            'cookies' => [],
             'backtraceLimit' => 0,
         ];
     }
@@ -95,7 +93,7 @@ class Config
      * Allow access to the Config with the dot.notation
      *
      * @credit Selvin Ortiz
-     * @link https://selvinortiz.com/blog/traversing-arrays-using-dot-notation
+     * @see https://selvinortiz.com/blog/traversing-arrays-using-dot-notation
      *
      * @param string $key
      * @param mixed $default
@@ -107,22 +105,18 @@ class Config
         // @assert $key is a non-empty string
         // @assert $data is a loopable array
         // @otherwise return $default value
-        if (!is_string($key) || empty($key) || !count($data))
-        {
+        if (!is_string($key) || empty($key) || !count($data)) {
             return $default;
         }
 
         // @assert $key contains a dot notated string
-        if (strpos($key, '.') !== false)
-        {
+        if (false !== strpos($key, '.')) {
             $keys = explode('.', $key);
 
-            foreach ($keys as $innerKey)
-            {
+            foreach ($keys as $innerKey) {
                 // @assert $data[$innerKey] is available to continue
                 // @otherwise return $default value
-                if (!array_key_exists($innerKey, $data))
-                {
+                if (!array_key_exists($innerKey, $data)) {
                     return $default;
                 }
 
@@ -135,5 +129,4 @@ class Config
         // @fallback returning value of $key in $data or $default value
         return array_key_exists($key, $data) ? $data[$key] : $default;
     }
-
 }

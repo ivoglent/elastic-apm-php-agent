@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  *
  * @license http://opensource.org/licenses/MIT MIT
- * @link https://github.com/philkra/elastic-apm-php-agent GitHub
+ * @see https://github.com/philkra/elastic-apm-php-agent GitHub
  */
 
 namespace PhilKra\Traces;
@@ -16,13 +16,13 @@ use PhilKra\Traces\Metricset\Metric;
 /**
  * APM Metric's
  *
- * @link https://www.elastic.co/guide/en/apm/server/6.7/metricset-api.html
+ * @see https://www.elastic.co/guide/en/apm/server/6.7/metricset-api.html
  * @version 6.7 (v2)
  */
 class Metricset extends TimedTrace
 {
 
-    /** @var array **/
+    /** @var array * */
     private $samples = [];
 
     public function __construct()
@@ -42,20 +42,19 @@ class Metricset extends TimedTrace
     }
 
     /**
-    * Serialize Metrics
-    *
-    * @return array
-    */
-    public function jsonSerialize() : array
+     * Serialize Metrics
+     *
+     * @return array
+     */
+    public function jsonSerialize(): array
     {
         $payload = [
           'metricset' => [
               'timestamp' => $this->timestamp,
-              'samples'   => $this->samples,
-          ]
+              'samples' => $this->samples,
+          ],
       ];
 
-      return $payload;
+        return $payload;
     }
-
 }

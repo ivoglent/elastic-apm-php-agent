@@ -6,28 +6,24 @@
  * file that was distributed with this source code.
  *
  * @license http://opensource.org/licenses/MIT MIT
- * @link https://github.com/philkra/elastic-apm-php-agent GitHub
+ * @see https://github.com/philkra/elastic-apm-php-agent GitHub
  */
 
 namespace PhilKra\Traces;
 
-
-
 /**
  * APM Error
  *
- * @link https://www.elastic.co/guide/en/apm/server/6.7/error-api.html
+ * @see https://www.elastic.co/guide/en/apm/server/6.7/error-api.html
  * @version 6.7 (v2)
  */
 class Error extends Event
 {
 
-
     /**
      * @var array
      */
     private $stacktrace;
-
 
     /**
      * @var
@@ -37,7 +33,7 @@ class Error extends Event
     /**
      * Error | Exception
      *
-     * @link http://php.net/manual/en/class.throwable.php
+     * @see http://php.net/manual/en/class.throwable.php
      *
      * @var \Throwable
      */
@@ -51,28 +47,31 @@ class Error extends Event
     {
         parent::__construct();
         $this->throwable = $throwable;
-        $this->stacktrace  = self::mapStacktrace($this->throwable->getTrace());
+        $this->stacktrace = self::mapStacktrace($this->throwable->getTrace());
         $this->contex = $contexts;
     }
 
     /**
      * @return mixed
      */
-    public function getContext() {
+    public function getContext()
+    {
         return $this->contex;
     }
 
     /**
      * @return string
      */
-    public function getTransactionId() {
+    public function getTransactionId()
+    {
         return $this->transaction_id;
     }
 
     /**
      * @param string $tranaction_id
      */
-    public function setTransactionId(string  $tranaction_id) {
+    public function setTransactionId(string  $tranaction_id)
+    {
         $this->transaction_id = $tranaction_id;
     }
 
@@ -81,7 +80,8 @@ class Error extends Event
      *
      * @return Transaction
      */
-    public function getTransaction() {
+    public function getTransaction()
+    {
         return $this->transaction;
     }
 
@@ -90,35 +90,35 @@ class Error extends Event
      *
      * @return array
      */
-    public function getStacktrace() {
+    public function getStacktrace()
+    {
         return $this->stacktrace;
     }
-
 
     /**
      * Serialize Error Event
      *
      * @return array
      */
-    public function jsonSerialize() : array
+    public function jsonSerialize(): array
     {
         $paload = [
             'error' => [
-                'id'        => $this->getId(),
+                'id' => $this->getId(),
                 'timestamp' => $this->timestamp,
-                'context'   => $this->getContext(),
-                'culprit'   => sprintf('%s:%d', $this->throwable->getFile(), $this->throwable->getLine()),
+                'context' => $this->getContext(),
+                'culprit' => sprintf('%s:%d', $this->throwable->getFile(), $this->throwable->getLine()),
                 'exception' => [
-                    'message'    => $this->throwable->getMessage(),
-                    'type'       => get_class($this->throwable),
-                    'code'       => $this->throwable->getCode(),
+                    'message' => $this->throwable->getMessage(),
+                    'type' => get_class($this->throwable),
+                    'code' => $this->throwable->getCode(),
                     'stacktrace' => self::mapStacktrace($this->throwable->getTrace()),
                 ],
                 'parent_id' => $this->getParentId(),
                 'trace_id' => $this->getTraceId(),
                 'transaction_id' => $this->getTransactionId(),
-                'transaction' => $this->transaction
-            ]
+                'transaction' => $this->transaction,
+            ],
         ];
 
         return $paload;
@@ -129,28 +129,27 @@ class Error extends Event
      *
      * @return array
      */
-    public static function mapStacktrace(array $traces) : array
+    public static function mapStacktrace(array $traces): array
     {
         $stacktrace = [];
 
         foreach ($traces as $trace) {
             $item = [
-                'function' => $trace['function'] ?? '(closure)'
+                'function' => $trace['function'] ?? '(closure)',
             ];
 
-            if (isset($trace['line']) === true) {
+            if (true === isset($trace['line'])) {
                 $item['lineno'] = $trace['line'];
             }
 
-            if (isset($trace['file']) === true) {
+            if (true === isset($trace['file'])) {
                 $item['filename'] = basename($trace['file']);
                 $item['abs_path'] = ($trace['file']);
             }
 
-            if (isset($trace['class']) === true) {
+            if (true === isset($trace['class'])) {
                 $item['module'] = $trace['class'];
             }
-
 
             if (!isset($item['lineno'])) {
                 $item['lineno'] = 0;
@@ -160,9 +159,9 @@ class Error extends Event
                 $item['filename'] = '(anonymous)';
             }
 
-            $stacktrace[] =  $item;
+            $stacktrace[] = $item;
         }
+
         return $stacktrace;
     }
-
 }

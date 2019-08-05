@@ -1,16 +1,14 @@
 # Elastic APM: PHP Agent
 
-[![Build Status](https://travis-ci.com/philkra/elastic-apm-php-agent.svg?branch=master)](https://travis-ci.org/philkra/elastic-apm-php-agent)
 
 ---
 
-**Please note:** This is not an official Elastic APM agent, the PHP APM agent is a [community developed agent](https://github.com/elastic/apm-contrib#community-developed-agents).
+**Please note 1:** This is not an official Elastic APM agent, the PHP APM agent is a [community developed agent](https://github.com/elastic/apm-contrib#community-developed-agents).
+**Please note 2:** This is a forked repository from [original repo](https://github.com/philkra/elastic-apm-php-agent). But I've modified too many things so I can not create PR to merge it back :). Anyway, thank to @philkra.
 
 ---
 
-This is a PHP agent for Elastic.co's APM product: https://www.elastic.co/solutions/apm. Laravel & Lumen package https://github.com/philkra/elastic-apm-laravel
-
-*Please note* that currently only the `v1` intake API of the APM server is supported, `v2` is in planing.
+This is a PHP agent for Elastic.co's APM product: https://www.elastic.co/solutions/apm. **It's working on v2 APM' apis only**.
 
 ## Installation
 The recommended way to install the agent is through [Composer](http://getcomposer.org).
@@ -18,7 +16,7 @@ The recommended way to install the agent is through [Composer](http://getcompose
 Run the following composer command
 
 ```bash
-php composer.phar require philkra/elastic-apm-php-agent
+php composer.phar require ivoglent/elastic-apm-php-agent
 ```
 
 After installing, you need to require Composer's autoloader:
