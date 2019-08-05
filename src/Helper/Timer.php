@@ -57,7 +57,7 @@ class Timer
     /**
      * Stop the Timer
      *
-     * @throws \PhilKra\Exception\Timer\NotStartedException
+     * @throws NotStartedException
      */
     public function stop(): void
     {
@@ -87,9 +87,10 @@ class Timer
     /**
      * Get the current elapsed Interval of the Timer in Miliseconds
      *
-     * @throws \PhilKra\Exception\Timer\NotStartedException
-     *
      * @return float
+     * @throws NotStoppedException
+     *
+     * @throws NotStartedException
      */
     public function getElapsed(): float
     {
@@ -97,9 +98,10 @@ class Timer
             throw new NotStartedException();
         }
 
-        return (null === $this->stoppedOn) ?
+        $time = (null === $this->stoppedOn) ?
             $this->milliSeconds() - $this->startedOn :
             $this->getDuration();
+        return $time >= 0 ? $time : 0;
     }
 
     /**

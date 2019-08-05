@@ -10,8 +10,8 @@ class Curl
 {
     private $handle = null;
 
-    public function __construct($url) {
-        $this->handle = curl_init($url);
+    public function __construct() {
+        $this->handle = curl_init();
     }
 
     public function setOption($name, $value) {
@@ -23,6 +23,8 @@ class Curl
     }
 
     public function close() {
-        curl_close($this->handle);
+        if ($this->handle) {
+            curl_close($this->handle);
+        }
     }
 }

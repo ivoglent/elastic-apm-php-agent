@@ -34,8 +34,6 @@ class Http implements TransportInterface
     public function __construct(Config $config)
     {
         $this->config = $config;
-        $endpoint = sprintf('%s/intake/v2/events', $this->config->get('transport.host'));
-        $this->curl = new Curl($endpoint);
     }
 
     /**
@@ -43,12 +41,16 @@ class Http implements TransportInterface
      */
     public function send(TracesStore $store)
     {
+        $endpoint = sprintf('%s/intake/v2/events', $this->config->get('transport.host'));
+        $this->curl = new Curl();
+
         $data = $store->toNdJson();
 
+        $this->curl->setOption(CURLOPT_URL, $endpoint);
         $this->curl->setOption(CURLOPT_RETURNTRANSFER, true);
         $this->curl->setOption(CURLOPT_HEADER, false);
         $this->curl->setOption(CURLOPT_NOSIGNAL, 1);
-        $this->curl->setOption(CURLOPT_TIMEOUT_MS, 1000);
+        $this->curl->setOption(CURLOPT_TIMEOUT_MS, (int) $this->config->get('transport.timeout', 3000));
         $this->curl->setOption(CURLINFO_HEADER_OUT, true);
         $this->curl->setOption(CURLOPT_POST, true);
         $this->curl->setOption(CURLOPT_POSTFIELDS, $data);
