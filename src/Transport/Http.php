@@ -48,7 +48,7 @@ class Http implements TransportInterface
         $this->curl->setOption(CURLOPT_RETURNTRANSFER, true);
         $this->curl->setOption(CURLOPT_HEADER, false);
         $this->curl->setOption(CURLOPT_NOSIGNAL, 1);
-        $this->curl->setOption(CURLOPT_TIMEOUT_MS, 10);
+        $this->curl->setOption(CURLOPT_TIMEOUT_MS, 1000);
         $this->curl->setOption(CURLINFO_HEADER_OUT, true);
         $this->curl->setOption(CURLOPT_POST, true);
         $this->curl->setOption(CURLOPT_POSTFIELDS, $data);
