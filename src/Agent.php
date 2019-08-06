@@ -19,6 +19,7 @@ use PhilKra\Factories\TracesFactory;
 use PhilKra\Helper\Config;
 use PhilKra\Helper\Timer;
 use PhilKra\Stores\TracesStore;
+use PhilKra\Traces\Span;
 use PhilKra\Traces\TimedTrace;
 use PhilKra\Traces\Trace;
 use PhilKra\Transport\TransportFactory;
@@ -166,7 +167,7 @@ class Agent
      */
     public function register(Trace $trace): void
     {
-        if ($trace instanceof TimedTrace) {
+        if ($trace instanceof Span) {
             if ($trace->getDuration() < $this->config->get('minimumSpanDuration', 20)) {
                 return;
             }
