@@ -64,6 +64,13 @@ class Transaction extends Event
         $this->name = trim($name);
         $this->type = trim($type);
     }
+
+    public function stop(string $result = null): void
+    {
+        $this->result = $result;
+        parent::stop();
+    }
+
     /**
      * Add a Span to the Transaction
      *
@@ -144,11 +151,11 @@ class Transaction extends Event
               'duration' => $this->duration,
               'sampled' => $this->sampled,
               'span_count' => [
-                  'started' => 0,
+                  'started' => count($this->spans),
                   'dopped' => 0,
               ],
           ],
-      ];
+        ];
 
         return $payload;
     }
