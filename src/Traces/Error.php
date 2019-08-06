@@ -56,7 +56,7 @@ class Error extends Event
      */
     public function getContext()
     {
-        return $this->contex;
+        return $this->context;
     }
 
     /**
