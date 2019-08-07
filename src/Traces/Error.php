@@ -102,7 +102,7 @@ class Error extends Event
      */
     public function jsonSerialize(): array
     {
-        $paload = [
+        $payload = [
             'error' => [
                 'id' => $this->getId(),
                 'timestamp' => $this->timestamp,
@@ -121,7 +121,7 @@ class Error extends Event
             ],
         ];
 
-        return $paload;
+        return $payload;
     }
 
     /**
