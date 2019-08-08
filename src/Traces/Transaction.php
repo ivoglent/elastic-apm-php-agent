@@ -43,6 +43,11 @@ class Transaction extends Event
     private $result;
 
     /**
+     * @var Context | null
+     */
+    private $context;
+
+    /**
      * Transactions that are 'sampled' will include all available information. Transactions that are not sampled will not have 'spans' or 'context'. Defaults to true.
      *
      * @var
@@ -134,6 +139,15 @@ class Transaction extends Event
     }
 
     /**
+     * @param mixed $context
+     */
+    public function setContext($context): void
+    {
+        $this->context = $context;
+    }
+
+
+    /**
      * Serialize Error
      *
      * @return array
@@ -144,7 +158,7 @@ class Transaction extends Event
           'transaction' => [
               'id' => $this->getId(),
               'trace_id' => $this->getTraceId(),
-              //'parent_id'      => $this->getParentId(),
+              'result' => $this->result,
               'name' => $this->name,
               'type' => $this->type,
               'timestamp' => $this->timestamp,
@@ -154,6 +168,7 @@ class Transaction extends Event
                   'started' => count($this->spans),
                   'dopped' => 0,
               ],
+              'context' => $this->context
           ],
         ];
 
