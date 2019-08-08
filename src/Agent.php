@@ -20,7 +20,6 @@ use PhilKra\Helper\Config;
 use PhilKra\Helper\Timer;
 use PhilKra\Stores\TracesStore;
 use PhilKra\Traces\Span;
-use PhilKra\Traces\TimedTrace;
 use PhilKra\Traces\Trace;
 use PhilKra\Transport\TransportFactory;
 use PhilKra\Transport\TransportInterface;
@@ -35,7 +34,7 @@ class Agent
      *
      * @var string
      */
-    public const VERSION = '6.6.3';
+    public const VERSION = '6.6.4';
 
     /**
      * Agent Name
