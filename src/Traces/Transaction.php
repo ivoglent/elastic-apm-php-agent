@@ -131,17 +131,17 @@ class Transaction extends Event
     }
 
     /**
-     * @param string $result
+     * @param string|null $result
      */
-    public function setResult(string $result): void
+    public function setResult(?string $result = null): void
     {
         $this->result = $result;
     }
 
     /**
-     * @param mixed $context
+     * @param Context|null $context
      */
-    public function setContext($context): void
+    public function setContext(?Context $context = null): void
     {
         $this->context = $context;
     }
