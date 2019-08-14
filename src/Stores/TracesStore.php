@@ -14,6 +14,7 @@ namespace PhilKra\Stores;
 use PhilKra\Traces\Error;
 use PhilKra\Traces\Span;
 use PhilKra\Traces\Trace;
+use PhilKra\Traces\Transaction;
 
 /**
  * Registry for <b>all</b> captured Events
@@ -74,6 +75,19 @@ class TracesStore implements \JsonSerializable
     public function jsonSerialize(): array
     {
         return $this->store;
+    }
+
+    /**
+     * @return Transaction|null
+     */
+    public function getTransaction() : ?Transaction
+    {
+        foreach ($this->store as &$item) {
+            if ($item instanceof Transaction) {
+                return $item;
+            }
+        }
+        return null;
     }
 
     /**

@@ -5,7 +5,9 @@ use PhilKra\Agent;
 use PhilKra\Factories\TracesFactory;
 use PhilKra\Helper\Config;
 use PhilKra\Stores\TracesStore;
+use PhilKra\Traces\Span;
 use PhilKra\Traces\Trace;
+use PhilKra\Traces\Transaction;
 use PhilKra\Transport\TransportInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 
@@ -27,7 +29,10 @@ class AgentTest extends TestCase {
         parent::setUp();
         $this->agent = new Agent([
             'name' => 'unit-test',
-            'version' => '1.0'
+            'version' => '1.0',
+            'sampleRate' => 1.0,
+            'minimumSpanDuration' => 20,
+            'maximumTransactionSpan' => 2
         ], [
             'user' => []
         ]);
@@ -60,11 +65,58 @@ class AgentTest extends TestCase {
         $this->agent->register($trace);
     }
 
+    public function testRegisterSpanMinDuration() {
+        $trace = $this->createMock(Span::class);
+        $trace->expects(self::once())->method('getDuration')->willReturn(10);
+        $transaction = $this->createMock(Transaction::class);
+        $this->traceStore->expects(self::atLeastOnce())->method('getTransaction')->willReturn($transaction);
+        $this->traceStore->expects(self::never())->method('register')->with($trace);
+        $this->agent->register($trace);
+    }
+
+    public function testRegisterSpanMaxSpan() {
+        $trace = $this->createMock(Span::class);
+        $this->traceStore->expects(self::once())->method('list')->willReturn([1,2,3]);
+        $transaction = $this->createMock(Transaction::class);
+        $this->traceStore->expects(self::atLeastOnce())->method('getTransaction')->willReturn($transaction);
+        $trace->expects(self::once())->method('getDuration')->willReturn(30);
+        $this->traceStore->expects(self::never())->method('register')->with($trace);
+        $this->agent->register($trace);
+    }
+
+    public function testRegisterSpans() {
+
+        $trace = $this->createMock(Span::class);
+        $trace->expects(self::once())->method('getDuration')->willReturn(20);
+        $transaction = $this->createMock(Transaction::class);
+        $this->traceStore->expects(self::atLeastOnce())->method('getTransaction')->willReturn($transaction);
+        $this->traceStore->expects(self::once())->method('list')->willReturn([1]);
+        $this->traceStore->expects(self::once())->method('register')->with($trace);
+
+        $this->agent->register($trace);
+    }
+
     public function testSendWithRegisteredTraces() {
         $this->traceStore->expects(self::once())->method('isEmpty')->willReturn(false);
         $this->traceStore->expects(self::once())->method('reset');
         $this->agent->send();
     }
+
+    public function testSampleRateApplied() {
+        $reflection = new \ReflectionClass($this->agent);
+        $reflectionProperty = $reflection->getProperty('sampleRateApplied');
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($this->agent, true);
+        $trace = $this->createMock(Span::class);
+        $trace->expects(self::never())->method('getDuration')->willReturn(30);
+        $transaction = $this->createMock(Transaction::class);
+        $this->traceStore->expects(self::atLeastOnce())->method('getTransaction')->willReturn($transaction);
+        $this->traceStore->expects(self::never())->method('register')->with($trace);
+
+        $this->agent->register($trace);
+    }
+
+
 
 
 }

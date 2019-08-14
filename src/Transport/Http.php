@@ -42,8 +42,9 @@ class Http implements TransportInterface
     public function send(TracesStore $store)
     {
         $endpoint = sprintf('%s/intake/v2/events', $this->config->get('transport.host'));
-        $this->curl = new Curl();
-
+        if (null === $this->curl) {
+            $this->curl = new Curl();
+        }
         $data = $store->toNdJson();
 
         $this->curl->setOption(CURLOPT_URL, $endpoint);
