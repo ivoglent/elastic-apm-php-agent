@@ -30,7 +30,7 @@ class AgentTest extends TestCase {
         $this->agent = new Agent([
             'name' => 'unit-test',
             'version' => '1.0',
-            'sampleRate' => 0.1,
+            'sampleRate' => 1.0,
             'minimumSpanDuration' => 20,
             'maximumTransactionSpan' => 2
         ], [
@@ -68,6 +68,8 @@ class AgentTest extends TestCase {
     public function testRegisterSpanMinDuration() {
         $trace = $this->createMock(Span::class);
         $trace->expects(self::once())->method('getDuration')->willReturn(10);
+        $transaction = $this->createMock(Transaction::class);
+        $this->traceStore->expects(self::atLeastOnce())->method('getTransaction')->willReturn($transaction);
         $this->traceStore->expects(self::never())->method('register')->with($trace);
         $this->agent->register($trace);
     }
@@ -76,25 +78,20 @@ class AgentTest extends TestCase {
         $trace = $this->createMock(Span::class);
         $this->traceStore->expects(self::once())->method('list')->willReturn([1,2,3]);
         $transaction = $this->createMock(Transaction::class);
-        $this->traceStore->expects(self::once())->method('getTransaction')->willReturn($transaction);
+        $this->traceStore->expects(self::atLeastOnce())->method('getTransaction')->willReturn($transaction);
         $trace->expects(self::once())->method('getDuration')->willReturn(30);
         $this->traceStore->expects(self::never())->method('register')->with($trace);
         $this->agent->register($trace);
     }
 
     public function testRegisterSpans() {
-        mt_srand(0);
-        $rand = mt_rand(1, 100);
+
         $trace = $this->createMock(Span::class);
         $trace->expects(self::once())->method('getDuration')->willReturn(20);
-        $this->traceStore->expects(self::once())->method('list')->willReturn([1]);
         $transaction = $this->createMock(Transaction::class);
-        $this->traceStore->expects(self::once())->method('getTransaction')->willReturn($transaction);
-        if ($rand > $this->agent->getConfig()->get('sampleRate', 0.1)) {
-            $this->traceStore->expects(self::never())->method('register')->with($trace);
-        } else {
-            $this->traceStore->expects(self::once())->method('register')->with($trace);
-        }
+        $this->traceStore->expects(self::atLeastOnce())->method('getTransaction')->willReturn($transaction);
+        $this->traceStore->expects(self::once())->method('list')->willReturn([1]);
+        $this->traceStore->expects(self::once())->method('register')->with($trace);
 
         $this->agent->register($trace);
     }
@@ -104,6 +101,22 @@ class AgentTest extends TestCase {
         $this->traceStore->expects(self::once())->method('reset');
         $this->agent->send();
     }
+
+    public function testSampleRateApplied() {
+        $reflection = new \ReflectionClass($this->agent);
+        $reflectionProperty = $reflection->getProperty('sampleRateApplied');
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($this->agent, true);
+        $trace = $this->createMock(Span::class);
+        $trace->expects(self::never())->method('getDuration')->willReturn(30);
+        $transaction = $this->createMock(Transaction::class);
+        $this->traceStore->expects(self::atLeastOnce())->method('getTransaction')->willReturn($transaction);
+        $this->traceStore->expects(self::never())->method('register')->with($trace);
+
+        $this->agent->register($trace);
+    }
+
+
 
 
 }

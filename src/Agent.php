@@ -86,6 +86,8 @@ class Agent
      */
     private $httpClient;
 
+    private $sampleRateApplied = false;
+
     /**
      * Setup the APM Agent
      *
@@ -128,6 +130,11 @@ class Agent
         // Start Global Agent Timer
         $this->timer = new Timer();
         $this->timer->start();
+
+        $txtRate = (float) $this->config->get('sampleRate', 1.0);
+        if ($txtRate < 1.0 && mt_rand(1, 100) > ($txtRate * 100)) {
+            $this->sampleRateApplied = true;
+        }
     }
 
     /**
@@ -168,20 +175,25 @@ class Agent
      */
     public function register(Trace $trace): void
     {
+        $transaction = $this->traces->getTransaction();
         if ($trace instanceof Span) {
+            if ($this->sampleRateApplied) {
+                if ($transaction) {
+                    $this->traces->getTransaction()->droppedSpan();
+                }
+                return;
+            }
             if ($trace->getDuration() < $this->config->get('minimumSpanDuration', 20)) {
+                if ($transaction) {
+                    $this->traces->getTransaction()->droppedSpan();
+                }
                 return;
             }
             if (count($this->traces->list()) > $this->config->get('maximumTransactionSpan', 100)) {
-                $this->traces->getTransaction()->droppedSpan();
-                return;
-            }
-            $txtRate = (float) $this->config->get('sampleRate', 1.0);
-            if ($txtRate < 1.0) {
-                if (mt_rand(1, 100) > ($txtRate * 100)) {
+                if ($transaction) {
                     $this->traces->getTransaction()->droppedSpan();
-                    return;
                 }
+                return;
             }
         }
         $this->traces->register($trace);
