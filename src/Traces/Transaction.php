@@ -50,18 +50,20 @@ class Transaction extends Event
     /**
      * Transactions that are 'sampled' will include all available information. Transactions that are not sampled will not have 'spans' or 'context'. Defaults to true.
      *
-     * @var
+     * @var bool
      */
     private $sampled = true;
+
+    /**
+     * @var int
+     */
+    private $droppedSpan = 0;
 
     /**
      * @var array
      */
     private $spans = [];
 
-    /**
-     * @param string $type
-     */
     public function __construct(string $name, string $type)
     {
         parent::__construct();
@@ -146,6 +148,28 @@ class Transaction extends Event
         $this->context = $context;
     }
 
+    /**
+     * @return bool
+     */
+    public function getSampled(): bool
+    {
+        return $this->sampled;
+    }
+
+    /**
+     * @param bool $sampled
+     */
+    public function setSampled(bool $sampled): void
+    {
+        $this->sampled = $sampled;
+    }
+
+    /**
+     * Increase dropped span number
+     */
+    public function droppedSpan() {
+        $this->droppedSpan++;
+    }
 
     /**
      * Serialize Error
@@ -166,7 +190,7 @@ class Transaction extends Event
               'sampled' => $this->sampled,
               'span_count' => [
                   'started' => count($this->spans),
-                  'dopped' => 0,
+                  'dopped' => $this->droppedSpan,
               ],
               'context' => $this->context
           ],

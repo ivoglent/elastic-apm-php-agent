@@ -21,6 +21,7 @@ use PhilKra\Helper\Timer;
 use PhilKra\Stores\TracesStore;
 use PhilKra\Traces\Span;
 use PhilKra\Traces\Trace;
+use PhilKra\Traces\Transaction;
 use PhilKra\Transport\TransportFactory;
 use PhilKra\Transport\TransportInterface;
 
@@ -34,7 +35,7 @@ class Agent
      *
      * @var string
      */
-    public const VERSION = '6.6.5';
+    public const VERSION = '6.6.6';
 
     /**
      * Agent Name
@@ -92,6 +93,7 @@ class Agent
      * @param array $sharedContext Set shared contexts such as user and tags
      * @throws Exception\InvalidConfigException
      * @throws Exception\Timer\AlreadyRunningException
+     * @throws Exception\Timer\NotStartedException
      */
     public function __construct(array $config, array $sharedContext = [])
     {
@@ -171,7 +173,15 @@ class Agent
                 return;
             }
             if (count($this->traces->list()) > $this->config->get('maximumTransactionSpan', 100)) {
+                $this->traces->getTransaction()->droppedSpan();
                 return;
+            }
+            $txtRate = (float) $this->config->get('sampleRate', 1.0);
+            if ($txtRate < 1.0) {
+                if (mt_rand(1, 100) > ($txtRate * 100)) {
+                    $this->traces->getTransaction()->droppedSpan();
+                    return;
+                }
             }
         }
         $this->traces->register($trace);

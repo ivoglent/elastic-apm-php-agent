@@ -19,6 +19,7 @@ class HttpTest extends TestCase
     private $http;
     public function setUp() {
         $configMap = [
+            ['name', null, 'name'],
             ['secretToken', null, 'testToken'],
             ['transport.config', null, []]
         ];
@@ -33,8 +34,7 @@ class HttpTest extends TestCase
         $reflectionProperty = $reflection->getProperty('curl');
         $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($this->http, $client);
-
-        $client->expects(self::exactly(8))->method('setOption');
+        $client->expects(self::exactly(9))->method('setOption');
         $client->expects(self::once())->method('execute');
         $client->expects(self::once())->method('close');
 
