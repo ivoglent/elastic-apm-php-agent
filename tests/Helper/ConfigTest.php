@@ -32,9 +32,14 @@ class ConfigTest extends TestCase
             'env'            => [],
             'cookies'        => [],
             'backtraceLimit' => 0,
+            'minimumSpanDuration' => 20,
+            'maximumTransactionSpan' => 100,
+            'sampleRate' => 1.0,
             'name' => 'test'
         ];
-        $this->assertSame($expectedConfig, $config->asArray());
+        $realConfig = $config->asArray();
+        unset($realConfig['timestamp']);
+        $this->assertSame($expectedConfig, $realConfig);
     }
 
     public function testGetConfig() {

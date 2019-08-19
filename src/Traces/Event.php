@@ -2,6 +2,8 @@
 
 namespace PhilKra\Traces;
 
+use Ramsey\Uuid\Uuid;
+
 /**
  * Event Trace with Timing Context
  *
@@ -54,6 +56,7 @@ class Event extends TimedTrace
         parent::__construct();
 
         $this->id = $this->generateId();
+        $this->traceId = $this->generateTraceId();
     }
 
     /**
@@ -109,25 +112,25 @@ class Event extends TimedTrace
     /**
      * Generate a hexdecimal Id
      *
-     * <i>64 bit hex</id>
-     *
      * @return string
+     * @throws \Exception
      */
     public function generateId(): string
     {
-        return sprintf('%x', mt_rand(1000, 9999));
+        //return sprintf('%x', mt_rand(1000, 9999));
+        return Uuid::uuid4()->toString();
     }
 
     /**
      * Generate and write a hexdecimal Trace Id
      *
-     * <i>128 bit hex</id>
-     *
      * @return string
+     * @throws \Exception
      */
     public function generateTraceId(): string
     {
-        return sprintf('%x', mt_rand(100000000, 999999999));
+        //return sprintf('%x', mt_rand(100000000, 999999999));
+        return Uuid::uuid4()->toString();
     }
 
     /**

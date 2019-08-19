@@ -34,7 +34,7 @@ class Agent
      *
      * @var string
      */
-    public const VERSION = '6.6.5';
+    public const VERSION = '6.6.7';
 
     /**
      * Agent Name
@@ -70,9 +70,9 @@ class Agent
      * @var array
      */
     private $sharedContext = [
-      'user' => [],
-      'custom' => [],
-      'tags' => [],
+        'user' => [],
+        'custom' => [],
+        'tags' => [],
     ];
 
     /**
@@ -85,6 +85,8 @@ class Agent
      */
     private $httpClient;
 
+    private $sampleRateApplied = false;
+
     /**
      * Setup the APM Agent
      *
@@ -92,12 +94,16 @@ class Agent
      * @param array $sharedContext Set shared contexts such as user and tags
      * @throws Exception\InvalidConfigException
      * @throws Exception\Timer\AlreadyRunningException
+     * @throws Exception\Timer\NotStartedException
      */
     public function __construct(array $config, array $sharedContext = [])
     {
         // Init Agent Config
         $this->config = new Config($config);
+        $this->init();
+    }
 
+    private function init() {
         // Init http client
         $this->httpClient = TransportFactory::new($this->config);
 
@@ -126,8 +132,12 @@ class Agent
         // Start Global Agent Timer
         $this->timer = new Timer();
         $this->timer->start();
-    }
 
+        $txtRate = (float) $this->config->get('sampleRate', 1.0);
+        if ($txtRate < 1.0 && mt_rand(1, 100) > ($txtRate * 100)) {
+            $this->sampleRateApplied = true;
+        }
+    }
     /**
      * Inject a Custom Traces Factory
      *
@@ -166,11 +176,24 @@ class Agent
      */
     public function register(Trace $trace): void
     {
+        $transaction = $this->traces->getTransaction();
         if ($trace instanceof Span) {
+            if ($this->sampleRateApplied) {
+                if ($transaction) {
+                    $this->traces->getTransaction()->droppedSpan();
+                }
+                return;
+            }
             if ($trace->getDuration() < $this->config->get('minimumSpanDuration', 20)) {
+                if ($transaction) {
+                    $this->traces->getTransaction()->droppedSpan();
+                }
                 return;
             }
             if (count($this->traces->list()) > $this->config->get('maximumTransactionSpan', 100)) {
+                if ($transaction) {
+                    $this->traces->getTransaction()->droppedSpan();
+                }
                 return;
             }
         }
@@ -189,6 +212,10 @@ class Agent
         if (false === $this->traces->isEmpty()) {
             $this->httpClient->send($this->traces);
             $this->traces->reset();
+            //This line used for some consumer command which never terminated and transaction start and end in the loop
+            if (PHP_SAPI === 'cli') {
+                $this->init();
+            }
         }
     }
 }

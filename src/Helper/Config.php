@@ -87,7 +87,8 @@ class Config
             'cookies' => [],
             'backtraceLimit' => 0,
             'minimumSpanDuration' => 20,
-            'maximumTransactionSpan' => 100
+            'maximumTransactionSpan' => 100,
+            'sampleRate' => 1.0
         ];
     }
 
