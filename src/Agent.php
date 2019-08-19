@@ -34,7 +34,7 @@ class Agent
      *
      * @var string
      */
-    public const VERSION = '6.6.7';
+    public const VERSION = '6.6.8';
 
     /**
      * Agent Name
@@ -87,6 +87,7 @@ class Agent
 
     private $sampleRateApplied = false;
 
+
     /**
      * Setup the APM Agent
      *
@@ -100,6 +101,7 @@ class Agent
     {
         // Init Agent Config
         $this->config = new Config($config);
+        $this->sharedContext = array_merge($this->sharedContext, $sharedContext);
         $this->init();
     }
 
@@ -115,12 +117,8 @@ class Agent
 
         // Generate Metadata Trace
         $metadata = $this->factory->newMetadata();
-        $metadata->getUser()->initFromArray($sharedContext['user']);
+        $metadata->getUser()->initFromArray($this->sharedContext['user']);
         $this->register($metadata);
-
-        // Init the Shared Context
-        $this->sharedContext['custom'] = $sharedContext['custom'] ?? [];
-        $this->sharedContext['tags'] = $sharedContext['tags'] ?? [];
 
         // Let's misuse the context to pass the environment variable and cookies
         // config to the EventBeans and the getContext method

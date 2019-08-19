@@ -21,9 +21,11 @@ class SpanTest extends TestCase
         $this->span = new Span('TestName', 'TestType');
         $transaction = new Transaction('TestTransactionName', 'TestTransactionType');
         $transaction->setTraceId('testTrace');
+        $transaction->setId('testTransaction');
         $transaction->start();
         $this->span->setTransaction($transaction);
-        $this->span->setTraceId($transaction->getTraceId());
+        $this->span->setTraceId('testTrace');
+        $this->span->setId('testSpan');
         $this->span->start();
 
         $reflection = new \ReflectionClass($this->span);
@@ -39,9 +41,9 @@ class SpanTest extends TestCase
     public function testCreateSpan() {
         $expectedPayload = [
             'span' => [
-                'id' => '10a9',
+                'id' => 'testSpan',
                 'action' => null,
-                'transaction_id' => 'a22',
+                'transaction_id' => 'testTransaction',
                 'trace_id' => 'testTrace',
                 'start' => 1,
                 'parent_id' => null,
@@ -61,9 +63,9 @@ class SpanTest extends TestCase
     public function testSetAction() {
         $expectedPayload = [
             'span' => [
-                'id' => '10a9',
+                'id' => 'testSpan',
                 'action' => 'testAction',
-                'transaction_id' => 'a22',
+                'transaction_id' => 'testTransaction',
                 'trace_id' => 'testTrace',
                 'start' => 1,
                 'parent_id' => null,
@@ -85,9 +87,9 @@ class SpanTest extends TestCase
         $this->span->addContext('http', $httpContext);
         $expectedPayload = [
             'span' => [
-                'id' => '10a9',
+                'id' => 'testSpan',
                 'action' => null,
-                'transaction_id' => 'a22',
+                'transaction_id' => 'testTransaction',
                 'trace_id' => 'testTrace',
                 'start' => 1,
                 'parent_id' => null,

@@ -18,6 +18,8 @@ class TransactionTest extends TestCase
         parent::setUp();
         mt_srand(123456);
         $this->transaction = new Transaction('testName', 'testType');
+        $this->transaction->setId('testTransaction');
+        $this->transaction->setTraceId('testTrace');
     }
 
     public function testNameNadType() {
@@ -85,13 +87,12 @@ class TransactionTest extends TestCase
     }
 
     public function testSerialize() {
-        $this->transaction->setTraceId($this->transaction->generateTraceId());
         $data = $this->transaction->jsonSerialize();
         $data['transaction']['timestamp'] = null;
         $this->assertSame([
             'transaction' => [
-                'id' => '10a9',
-                'trace_id' => '1e7d69ea',
+                'id' => 'testTransaction',
+                'trace_id' => 'testTrace',
                 'result' => null,
                 'name' => 'testName',
                 'type' => 'testType',

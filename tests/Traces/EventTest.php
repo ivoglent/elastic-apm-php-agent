@@ -24,13 +24,13 @@ class EventTest extends TestCase
     }
 
     public function testEventId() {
-        $this->assertSame('10a9', $this->event->getId());
+        $this->assertEquals(36, strlen($this->event->getId()));
         $this->event->setId('id');
         $this->assertSame('id', $this->event->getId());
     }
 
     public function testEventTraceId() {
-        $this->assertSame('12ff8638', $this->event->getTraceId());
+        $this->assertEquals(36, strlen($this->event->getTraceId()));
         $this->event->setTraceId('traceId');
         $this->assertSame('traceId', $this->event->getTraceId());
     }
