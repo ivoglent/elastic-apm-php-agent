@@ -21,6 +21,7 @@ use PhilKra\Helper\Timer;
 use PhilKra\Stores\TracesStore;
 use PhilKra\Traces\Span;
 use PhilKra\Traces\Trace;
+use PhilKra\Traces\Transaction;
 use PhilKra\Transport\TransportFactory;
 use PhilKra\Transport\TransportInterface;
 
@@ -34,7 +35,7 @@ class Agent
      *
      * @var string
      */
-    public const VERSION = '6.6.8';
+    public const VERSION = '6.6.9';
 
     /**
      * Agent Name
@@ -85,7 +86,20 @@ class Agent
      */
     private $httpClient;
 
+    /**
+     * @var bool
+     */
     private $sampleRateApplied = false;
+
+    /**
+     * @var int
+     */
+    private $droppedSpan = 0;
+
+    /**
+     * @var int
+     */
+    private $startedSpan = 0;
 
 
     /**
@@ -174,27 +188,26 @@ class Agent
      */
     public function register(Trace $trace): void
     {
-        $transaction = $this->traces->getTransaction();
         if ($trace instanceof Span) {
+            $this->startedSpan++;
             if ($this->sampleRateApplied) {
-                if ($transaction) {
-                    $this->traces->getTransaction()->droppedSpan();
-                }
+                $this->droppedSpan++;
                 return;
             }
             if ($trace->getDuration() < $this->config->get('minimumSpanDuration', 20)) {
-                if ($transaction) {
-                    $this->traces->getTransaction()->droppedSpan();
-                }
+                $this->droppedSpan++;
                 return;
             }
             if (count($this->traces->list()) > $this->config->get('maximumTransactionSpan', 100)) {
-                if ($transaction) {
-                    $this->traces->getTransaction()->droppedSpan();
-                }
+                $this->droppedSpan++;
                 return;
             }
         }
+        if ($trace instanceof Transaction) {
+            $trace->setStartedSpan($this->startedSpan);
+            $trace->setDroppedSpan($this->droppedSpan);
+        }
+
         $this->traces->register($trace);
     }
 
@@ -207,6 +220,7 @@ class Agent
      */
     public function send()
     {
+        $this->sampleRateApplied = false;
         if (false === $this->traces->isEmpty()) {
             $this->httpClient->send($this->traces);
             $this->traces->reset();

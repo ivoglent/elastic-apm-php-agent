@@ -32,16 +32,6 @@ class TransactionTest extends TestCase
         $this->assertSame('testType2', $this->transaction->getType());
     }
 
-    public function testChangeTranactionId() {
-        $span = $this->createMock(Span::class);
-        $span->expects(self::once())->method('setParentId')->with('transactionId');
-        $span->expects(self::once())->method('setTransaction')->with($this->transaction);
-
-        $this->transaction->addSpan($span);
-
-        $this->transaction->setId('transactionId');
-    }
-
     public function testSetResults() {
         $result = 'testResult';
         $this->transaction->setResult($result);
@@ -82,7 +72,16 @@ class TransactionTest extends TestCase
         $reflectionProperty = $reflection->getProperty('droppedSpan');
         $reflectionProperty->setAccessible(true);
         $this->assertEquals(0, $reflectionProperty->getValue($this->transaction));
-        $this->transaction->droppedSpan();
+        $this->transaction->setDroppedSpan(1);
+        $this->assertEquals(1, $reflectionProperty->getValue($this->transaction));
+    }
+
+    public function testStartedSpan() {
+        $reflection = new \ReflectionClass($this->transaction);
+        $reflectionProperty = $reflection->getProperty('startedSpan');
+        $reflectionProperty->setAccessible(true);
+        $this->assertEquals(0, $reflectionProperty->getValue($this->transaction));
+        $this->transaction->setStartedSpan(1);
         $this->assertEquals(1, $reflectionProperty->getValue($this->transaction));
     }
 
@@ -101,7 +100,7 @@ class TransactionTest extends TestCase
                 'sampled' => true,
                 'span_count' => [
                     'started' => 0,
-                    'dopped' => 0
+                    'dropped' => 0
                 ],
                 'context' => null
             ]

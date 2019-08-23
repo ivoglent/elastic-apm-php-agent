@@ -78,19 +78,6 @@ class TracesStore implements \JsonSerializable
     }
 
     /**
-     * @return Transaction|null
-     */
-    public function getTransaction() : ?Transaction
-    {
-        foreach ($this->store as &$item) {
-            if ($item instanceof Transaction) {
-                return $item;
-            }
-        }
-        return null;
-    }
-
-    /**
      * Generator to ND-JSON for Intake API v2
      * if object is not instance of Span or Error which contains child array type
      *

@@ -71,17 +71,4 @@ class TracesStoreTest extends TestCase
 
     }
 
-    public function testGetTransaction() {
-        $transaction = $this->createMock(Transaction::class);
-        $traceStore = new TracesStore();
-        $traceStore->register($transaction);
-
-        $this->assertSame($transaction, $traceStore->getTransaction());
-    }
-
-    public function testGetTransactionNull() {
-        $traceStore = new TracesStore();
-        $this->assertNull($traceStore->getTransaction());
-    }
-
 }
