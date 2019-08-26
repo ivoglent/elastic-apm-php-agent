@@ -145,6 +145,10 @@ class Agent
         $this->timer = new Timer();
         $this->timer->start();
 
+        $this->sampleRateApplied = false;
+        $this->droppedSpan = 0;
+        $this->startedSpan = 0;
+
         $txtRate = (float) $this->config->get('sampleRate', 1.0);
         if ($txtRate < 1.0 && mt_rand(1, 100) > ($txtRate * 100)) {
             $this->sampleRateApplied = true;
@@ -220,7 +224,6 @@ class Agent
      */
     public function send()
     {
-        $this->sampleRateApplied = false;
         if (false === $this->traces->isEmpty()) {
             $this->httpClient->send($this->traces);
             $this->traces->reset();
