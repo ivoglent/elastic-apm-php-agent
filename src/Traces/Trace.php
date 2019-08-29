@@ -16,4 +16,5 @@ namespace PhilKra\Traces;
  */
 interface Trace extends \JsonSerializable
 {
+
 }

@@ -11,6 +11,7 @@
 
 namespace PhilKra\Traces;
 
+use PhilKra\Exception\InvalidTimeException;
 use PhilKra\Traces\SpanContexts\SpanContext;
 
 /**
@@ -94,12 +95,18 @@ class Span extends Event
 
     /**
      * @param float|null $initAt
+     * @throws \PhilKra\Exception\Timer\AlreadyRunningException
      * @throws \PhilKra\Exception\Timer\NotStartedException
+     * @throws \PhilKra\Exception\Timer\NotStoppedException
+     * @throws InvalidTimeException
      */
     public function start(?float $initAt = null): void
     {
         parent::start($initAt);
         $this->start = $this->transaction->getTimer()->getElapsed();
+        if ($this->start < 0) {
+            throw new InvalidTimeException('Start position of span can not be negative!');
+        }
     }
 
     /**

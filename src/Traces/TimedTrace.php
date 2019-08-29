@@ -58,7 +58,7 @@ class TimedTrace implements Trace
     public function stop(): void
     {
         $this->timer->stop();
-        $this->duration = $this->getDuration();
+        $this->duration = $this->timer->getDuration();
     }
 
     /**
@@ -66,10 +66,14 @@ class TimedTrace implements Trace
      *
      * @return float
      * @throws NotStartedException
+     * @throws \PhilKra\Exception\Timer\NotStoppedException
      */
     public function getDuration(): float
     {
-        return $this->timer->getElapsed();
+        if (null === $this->duration) {
+            $this->stop();
+        }
+        return $this->duration;
     }
 
     /**
@@ -78,6 +82,14 @@ class TimedTrace implements Trace
     protected function getTimer(): Timer
     {
         return $this->timer;
+    }
+
+    /**
+     * @return float
+     */
+    public function getTimestamp(): float
+    {
+        return $this->timestamp;
     }
 
     /**

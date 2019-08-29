@@ -2,7 +2,7 @@
     "name" : "ivoglent/elastic-apm-php-agent",
     "description": "A php agent for Elastic APM",
     "license": "MIT",
-    "version": "6.6.9",
+    "version": "6.6.10",
     "require" : {
         "php" : ">= 7.1",
         "guzzlehttp/guzzle": "6.*",

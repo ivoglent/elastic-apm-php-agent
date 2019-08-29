@@ -25,6 +25,11 @@ class Timer
      */
     private $stoppedOn;
 
+    /**
+     * @var float
+     */
+    private $duration;
+
     public function __construct(float $startTime = null)
     {
         $this->startedOn = $startTime;
@@ -77,11 +82,20 @@ class Timer
      */
     public function getDuration(): int
     {
+        if (null !== $this->duration) {
+            return $this->duration;
+        }
+        if (null === $this->startedOn) {
+            throw new NotStartedException();
+        }
         if (null === $this->stoppedOn) {
+            if (null !== $this->startedOn) {
+                return $this->getElapsed();
+            }
             throw new NotStoppedException();
         }
 
-        return $this->stoppedOn - $this->startedOn;
+        return $this->duration = $this->stoppedOn - $this->startedOn;
     }
 
     /**
@@ -111,7 +125,7 @@ class Timer
     {
         $mt = explode(' ', microtime());
 
-        return ((float) $mt[1]) * 1000 + ((int) round($mt[0] * 1000));
+        return ((float) $mt[1]) * 1000 + ((int) ($mt[0] * 1000));
     }
 
     /**
@@ -121,6 +135,6 @@ class Timer
     {
         $mt = explode(' ', microtime());
 
-        return ((int) $mt[1]) * 1000000 + ((int) round($mt[0] * 1000000));
+        return ((int) $mt[1]) * 1000000 + ((int) ($mt[0] * 1000000));
     }
 }

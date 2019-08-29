@@ -11,8 +11,11 @@
 
 namespace PhilKra\Stores;
 
+use PhilKra\Exception\InvalidTimeException;
+use PhilKra\Exception\Timer\NotStartedException;
 use PhilKra\Traces\Error;
 use PhilKra\Traces\Span;
+use PhilKra\Traces\TimedTrace;
 use PhilKra\Traces\Trace;
 use PhilKra\Traces\Transaction;
 
@@ -24,9 +27,14 @@ class TracesStore implements \JsonSerializable
     /**
      * Set of Traces
      *
-     * @var array of PhilKra\Traces\Trace
+     * @var Trace[] array of PhilKra\Traces\Trace
      */
     protected $store = [];
+
+    /**
+     * @var Transaction
+     */
+    private $transaction;
 
     /**
      * Get all Registered Errors
@@ -46,6 +54,9 @@ class TracesStore implements \JsonSerializable
      */
     public function register(Trace $t): void
     {
+        if ($t instanceof Transaction) {
+            $this->transaction = $t;
+        }
         $this->store[] = $t;
     }
 
@@ -78,14 +89,49 @@ class TracesStore implements \JsonSerializable
     }
 
     /**
+     * @throws InvalidTimeException
+     * @throws NotStartedException
+     * @throws \PhilKra\Exception\Timer\NotStoppedException
+     */
+    private function validate() {
+        //Validate timestamp
+        $maxTimeRange = $this->transaction->getTimestamp() + $this->transaction->getDuration() * 1000;
+        $totalDuration = 0;
+        foreach ($this->store as $trace) {
+            if ($trace instanceof Span) {
+                if ($trace->getTimestamp() < $this->transaction->getTimestamp()) {
+                    throw new InvalidTimeException('Span timestamp can not be less than transaction timestamp');
+                }
+                if ($trace->getDuration() > $this->transaction->getDuration()) {
+                    throw new InvalidTimeException('Span duration can not be greater than transaction duration');
+                }
+                $totalDuration += $trace->getDuration();
+                if ($trace->getTimestamp() + $trace->getDuration() * 1000 > $maxTimeRange) {
+                    throw new InvalidTimeException('Invalid end of span time position');
+                }
+            }
+        }
+        if ($this->transaction->getDuration() < $totalDuration) {
+            throw new InvalidTimeException('Transaction duration can not be less than total span duration');
+        }
+
+    }
+
+    /**
      * Generator to ND-JSON for Intake API v2
      * if object is not instance of Span or Error which contains child array type
      *
      *
      * @return string
+     * @throws InvalidTimeException
+     * @throws NotStartedException
+     * @throws \PhilKra\Exception\Timer\NotStoppedException
      */
     public function toNdJson(): string
     {
+        if ($this->isEmpty() === false && $this->transaction) {
+            $this->validate();
+        }
         return sprintf("%s\n", implode("\n", array_map(function ($obj) {
             if (($obj instanceof Span || $obj instanceof Error) && !empty($obj->getStacktrace())) {
                 return json_encode($obj);

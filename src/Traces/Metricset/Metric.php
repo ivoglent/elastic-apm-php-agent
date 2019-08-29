@@ -23,14 +23,14 @@ class Metric
     /** @var string */
     private $name;
 
-    /** @var int */
+    /** @var mixed */
     private $value;
 
     /**
      * @param string $name
-     * @param int $value
+     * @param mixed $value
      */
-    public function __construct(string $name, int $value)
+    public function __construct(string $name, $value)
     {
         $this->name = trim($name);
         $this->value = $value;
@@ -45,9 +45,9 @@ class Metric
     }
 
     /**
-     * @return int
+     * @return mixed
      */
-    public function getValue(): int
+    public function getValue()
     {
         return $this->value;
     }

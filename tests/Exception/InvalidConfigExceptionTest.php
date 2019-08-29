@@ -11,6 +11,6 @@ class InvalidConfigExceptionTest extends TestCase
 {
     public function testCreateException() {
         $exception = new InvalidConfigException('Test');
-        $this->assertEquals('No app name registered in agent config.', $exception->getMessage());
+        $this->assertEquals('No app name registered in agent config. Test', $exception->getMessage());
     }
 }

@@ -17,8 +17,11 @@ namespace PhilKra;
 use PhilKra\Factories\DefaultTracesFactory;
 use PhilKra\Factories\TracesFactory;
 use PhilKra\Helper\Config;
+use PhilKra\Helper\MetricHelper;
 use PhilKra\Helper\Timer;
 use PhilKra\Stores\TracesStore;
+use PhilKra\Traces\Metricset;
+use PhilKra\Traces\Metricset\Metric;
 use PhilKra\Traces\Span;
 use PhilKra\Traces\Trace;
 use PhilKra\Traces\Transaction;
@@ -35,7 +38,7 @@ class Agent
      *
      * @var string
      */
-    public const VERSION = '6.6.9';
+    public const VERSION = '6.6.10';
 
     /**
      * Agent Name
@@ -101,6 +104,10 @@ class Agent
      */
     private $startedSpan = 0;
 
+    /**
+     * @var MetricHelper
+     */
+    private $metricHelper;
 
     /**
      * Setup the APM Agent
@@ -152,6 +159,11 @@ class Agent
         $txtRate = (float) $this->config->get('sampleRate', 1.0);
         if ($txtRate < 1.0 && mt_rand(1, 100) > ($txtRate * 100)) {
             $this->sampleRateApplied = true;
+        }
+
+        if ($this->config->get('enableMetrics', false)) {
+            $this->metricHelper = new MetricHelper();
+            $this->metricHelper->start();
         }
     }
     /**
@@ -225,6 +237,18 @@ class Agent
     public function send()
     {
         if (false === $this->traces->isEmpty()) {
+
+            //Include metrictset if it enabled
+            if ($this->config->get('enableMetrics', false)) {
+                $this->metricHelper->end();
+                $metricset = new Metricset();
+                foreach ($this->metricHelper->collectInformation() as $key => $value) {
+                    $metric = new Metric($key, $value);
+                    $metricset->put($metric);
+                }
+                $this->traces->register($metricset);
+            }
+
             $this->httpClient->send($this->traces);
             $this->traces->reset();
             //This line used for some consumer command which never terminated and transaction start and end in the loop

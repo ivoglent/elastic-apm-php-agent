@@ -49,12 +49,11 @@ class Metricset extends TimedTrace
     public function jsonSerialize(): array
     {
         $payload = [
-          'metricset' => [
-              'timestamp' => $this->timestamp,
-              'samples' => $this->samples,
-          ],
-      ];
-
+            'metricset' => [
+                'timestamp' => $this->timestamp,
+                'samples' => $this->samples,
+            ],
+        ];
         return $payload;
     }
 }
