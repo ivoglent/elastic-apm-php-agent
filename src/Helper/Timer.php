@@ -135,6 +135,6 @@ class Timer
     {
         $mt = explode(' ', microtime());
 
-        return ((int) $mt[1]) * 1000000 + ((int) ($mt[0] * 1000000));
+        return (int)  ($mt[1] * 1000000 + $mt[0] * 1000000);
     }
 }

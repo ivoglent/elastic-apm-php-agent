@@ -89,7 +89,7 @@ class Config
             'minimumSpanDuration' => 20,
             'maximumTransactionSpan' => 100,
             'sampleRate' => 1.0,
-            'enableMetrics' => true
+            'enableMetrics' => false
         ];
     }
 

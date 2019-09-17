@@ -11,41 +11,6 @@ namespace PhilKra\Helper;
  */
 class MetricHelper
 {
-    private $totalMemory = 0;
-    private $availableMemory = 0;
-    private $processMemory = 0;
-
-    private $totalCpuUsed = 0;
-    private $processCpuUsage = 0;
-
-    private $startProcessMemory;
-    private $startCpuUsage;
-
-    public function __construct()
-    {
-
-    }
-
-    public function start() {
-        $this->startProcessMemory = memory_get_usage();
-        $load = sys_getloadavg();
-        $this->startCpuUsage = $load[0];
-    }
-
-    public function end() {
-        $this->processMemory = memory_get_usage() - $this->startProcessMemory;
-        $load = sys_getloadavg();
-        $this->processCpuUsage = $load[0] - $this->startCpuUsage;
-
-        if ($this->processMemory < 0) {
-            $this->processMemory = 0;
-        }
-
-        if ($this->processCpuUsage < 0) {
-            $this->processCpuUsage = 0;
-        }
-    }
-
     /**
      * Collect all information about memory and cpu
      * and put them to array of APM metrics
@@ -53,26 +18,10 @@ class MetricHelper
      * @return array
      */
     public function collectInformation(): array {
-        $data = [
-            'system.cpu.total.norm.pct' => 0,
-            'system.memory.actual.free' => 0,
-            'system.memory.total' => 0,
-            'system.process.cpu.total.norm.pct' => 0,
-            'system.process.cpu.system.norm.pct' => 0,
-            'system.process.cpu.user.norm.pct' => 0,
-            'system.process.memory.size' => 0,
-            'system.process.memory.rss.bytes' => 0
-        ];
-
+        $data = [];
         $load = sys_getloadavg();
         $data['system.cpu.total.norm.pct'] = $load[0];
-        $data['system.process.cpu.total.norm.pct'] = $this->processCpuUsage;
-        $data['system.process.cpu.system.norm.pct'] = $this->processCpuUsage;
-        $data['system.process.memory.size'] = $this->processMemory;
-        //$data['system.process.memory.rss.bytes'] = $this->processMemory;
-
         $mem = $this->getMemoryUsage();
-
         $data['system.memory.total'] = $mem['total'];
         $data['system.memory.actual.free'] = $mem['free'];
 
@@ -113,46 +62,6 @@ class MetricHelper
         }
 
         return $mem;
-    }
-
-    /**
-     * @return int
-     */
-    public function getTotalMemory(): int
-    {
-        return $this->totalMemory;
-    }
-
-    /**
-     * @return int
-     */
-    public function getAvailableMemory(): int
-    {
-        return $this->availableMemory;
-    }
-
-    /**
-     * @return int
-     */
-    public function getProcessMemory(): int
-    {
-        return $this->processMemory;
-    }
-
-    /**
-     * @return int
-     */
-    public function getTotalCpuUsed(): int
-    {
-        return $this->totalCpuUsed;
-    }
-
-    /**
-     * @return int
-     */
-    public function getProcessCpuUsed(): int
-    {
-        return $this->processCpuUsage;
     }
 
 

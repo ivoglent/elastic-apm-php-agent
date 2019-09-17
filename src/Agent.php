@@ -105,11 +105,6 @@ class Agent
     private $startedSpan = 0;
 
     /**
-     * @var MetricHelper
-     */
-    private $metricHelper;
-
-    /**
      * Setup the APM Agent
      *
      * @param array $config
@@ -160,11 +155,6 @@ class Agent
         if ($txtRate < 1.0 && mt_rand(1, 100) > ($txtRate * 100)) {
             $this->sampleRateApplied = true;
         }
-
-        if ($this->config->get('enableMetrics', false)) {
-            $this->metricHelper = new MetricHelper();
-            $this->metricHelper->start();
-        }
     }
     /**
      * Inject a Custom Traces Factory
@@ -201,6 +191,7 @@ class Agent
      *
      * @param Trace $trace
      * @throws Exception\Timer\NotStartedException
+     * @throws Exception\Timer\NotStoppedException
      */
     public function register(Trace $trace): void
     {
@@ -219,9 +210,25 @@ class Agent
                 return;
             }
         }
+
+        //After transaction already stopped
         if ($trace instanceof Transaction) {
+            //Include metrictset if it enabled
+            if ($this->config->get('enableMetrics', false)) {
+                $metricHelper = new MetricHelper();
+                $metricset = new Metricset();
+                foreach ($metricHelper->collectInformation() as $key => $value) {
+                    $metric = new Metric($key, $value);
+                    $metricset->put($metric);
+                }
+                $this->traces->register($metricset);
+            }
+
             $trace->setStartedSpan($this->startedSpan);
             $trace->setDroppedSpan($this->droppedSpan);
+            if ($this->sampleRateApplied) {
+                $trace->setSampled(false);
+            }
         }
 
         $this->traces->register($trace);
@@ -237,18 +244,6 @@ class Agent
     public function send()
     {
         if (false === $this->traces->isEmpty()) {
-
-            //Include metrictset if it enabled
-            if ($this->config->get('enableMetrics', false)) {
-                $this->metricHelper->end();
-                $metricset = new Metricset();
-                foreach ($this->metricHelper->collectInformation() as $key => $value) {
-                    $metric = new Metric($key, $value);
-                    $metricset->put($metric);
-                }
-                $this->traces->register($metricset);
-            }
-
             $this->httpClient->send($this->traces);
             $this->traces->reset();
             //This line used for some consumer command which never terminated and transaction start and end in the loop

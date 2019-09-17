@@ -56,6 +56,10 @@ class TracesStore implements \JsonSerializable
     {
         if ($t instanceof Transaction) {
             $this->transaction = $t;
+        } else {
+            if ($this->transaction !== null) {
+                throw new \RuntimeException('Transaction should be last registration');
+            }
         }
         $this->store[] = $t;
     }
@@ -104,10 +108,6 @@ class TracesStore implements \JsonSerializable
                 }
                 if ($trace->getDuration() > $this->transaction->getDuration()) {
                     throw new InvalidTimeException('Span duration can not be greater than transaction duration');
-                }
-                $totalDuration += $trace->getDuration();
-                if ($trace->getTimestamp() + $trace->getDuration() * 1000 > $maxTimeRange) {
-                    throw new InvalidTimeException('Invalid end of span time position');
                 }
             }
         }

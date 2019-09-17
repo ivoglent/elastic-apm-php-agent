@@ -45,7 +45,7 @@ final class DefaultTracesFactory implements TracesFactory
     /**
      * {@inheritdoc}
      */
-    public function newSpan(string $name, string $type, ?string $action = null): Span
+    public function newSpan(string $name, string $type, ?string $subtype = null, ?string $action = null): Span
     {
         return new Span($name, $type, $action);
     }

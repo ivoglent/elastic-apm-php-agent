@@ -84,12 +84,13 @@ class Span extends Event
      */
     private $action;
 
-    public function __construct(string $name, string $type, string $action = null)
+    public function __construct(string $name, string $type, ?string $subtype = null, string $action = null)
     {
         parent::__construct();
 
         $this->name = trim($name);
         $this->type = trim($type);
+        $this->subtype = trim($subtype);
         $this->action = $action;
     }
 
