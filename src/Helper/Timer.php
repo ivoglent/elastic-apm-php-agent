@@ -76,9 +76,10 @@ class Timer
     /**
      * Get the elapsed Duration of this Timer in Miliseconds
      *
-     * @throws \PhilKra\Exception\Timer\NotStoppedException
-     *
      * @return int
+     * @throws NotStartedException
+     *
+     * @throws \PhilKra\Exception\Timer\NotStoppedException
      */
     public function getDuration(): int
     {
@@ -92,7 +93,6 @@ class Timer
             if (null !== $this->startedOn) {
                 return $this->getElapsed();
             }
-            throw new NotStoppedException();
         }
 
         return $this->duration = $this->stoppedOn - $this->startedOn;

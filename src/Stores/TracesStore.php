@@ -98,9 +98,6 @@ class TracesStore implements \JsonSerializable
      * @throws \PhilKra\Exception\Timer\NotStoppedException
      */
     private function validate() {
-        //Validate timestamp
-        $maxTimeRange = $this->transaction->getTimestamp() + $this->transaction->getDuration() * 1000;
-        $totalDuration = 0;
         foreach ($this->store as $trace) {
             if ($trace instanceof Span) {
                 if ($trace->getTimestamp() < $this->transaction->getTimestamp()) {
@@ -111,10 +108,6 @@ class TracesStore implements \JsonSerializable
                 }
             }
         }
-        if ($this->transaction->getDuration() < $totalDuration) {
-            throw new InvalidTimeException('Transaction duration can not be less than total span duration');
-        }
-
     }
 
     /**

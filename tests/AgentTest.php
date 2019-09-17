@@ -35,15 +35,11 @@ class AgentTest extends TestCase {
         ]);
 
         $this->traceStore = $this->createMock(TracesStore::class);
-        $reflection = new \ReflectionClass($this->agent);
-        $reflectionProperty = $reflection->getProperty('traces');
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($this->agent, $this->traceStore);
+        $this->setProxyValue($this->agent, 'traces', $this->traceStore);
 
         $this->transport = $this->createMock(TransportInterface::class);
-        $reflectionProperty = $reflection->getProperty('httpClient');
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($this->agent, $this->transport);
+        $this->setProxyValue($this->agent, 'httpClient', $this->transport);
+
     }
 
     public function testModifyFactory() {
@@ -99,10 +95,31 @@ class AgentTest extends TestCase {
         $this->agent->send();
     }
 
+    public function testRegisterWithMetric() {
+        /** @var Transaction|MockObject $transaction */
+        $transaction = $this->createMock(Transaction::class);
+        $config = $this->agent->getConfig();
+        $configData = $config->asArray();
+        $configData['enableMetrics'] = true;
+
+        $config = $this->setProxyValue($config, 'config', $configData);
+        $this->setProxyValue($this->agent, 'config', $config);
+        $this->setProxyValue($this->agent, 'sampleRateApplied', true);
+
+        $this->traceStore->expects(self::exactly(2))->method('register');
+        $this->agent->register($transaction);
+        $this->assertFalse($transaction->getSampled());
+    }
+
     private function setAgentSampleRate($value) {
-        $reflection = new \ReflectionClass($this->agent);
-        $reflectionProperty = $reflection->getProperty('sampleRateApplied');
+        return $this->setProxyValue($this->agent, 'sampleRateApplied', $value);
+    }
+
+    private function setProxyValue($object, $name, $value) {
+        $reflection = new \ReflectionClass($object);
+        $reflectionProperty = $reflection->getProperty($name);
         $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($this->agent, $value);
+        $reflectionProperty->setValue($object, $value);
+        return $object;
     }
 }

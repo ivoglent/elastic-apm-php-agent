@@ -58,24 +58,8 @@ final class TimerTest extends TestCase
         $this->assertEquals($timer->getElapsed(), $timer->getDuration());
     }
 
-    /**
-     * @depends testCanBeStartedAndStoppedWithDuration
-     *
-     * @covers  \PhilKra\Helper\Timer::start
-     * @covers  \PhilKra\Helper\Timer::getDuration
-     */
-    public function testCanBeStartedWithForcingDurationException()
-    {
-        $timer = new Timer();
-        $timer->start();
-
-        $this->expectException(NotStoppedException::class);
-
-        $timer->getDuration();
-    }
 
     /**
-     * @depends testCanBeStartedWithForcingDurationException
      *
      * @covers  \PhilKra\Helper\Timer::stop
      */
@@ -86,6 +70,31 @@ final class TimerTest extends TestCase
         $this->expectException(NotStartedException::class);
 
         $timer->stop();
+    }
+
+    /**
+     *
+     * @covers  \PhilKra\Helper\Timer::getDuration
+     */
+    public function testGetDurationWithoutStart()
+    {
+        $timer = new Timer();
+
+        $this->expectException(NotStartedException::class);
+
+        $timer->getDuration();
+    }
+
+    /**
+     *
+     * @covers  \PhilKra\Helper\Timer::getDuration
+     */
+    public function testGetDurationWithoutStop()
+    {
+        $timer = new Timer();
+        $timer->start();
+        sleep(1);
+        $this->assertGreaterThan(1, $timer->getDuration());
     }
 
     public function testCannotGetElapseWithoutStart()

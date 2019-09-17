@@ -153,7 +153,9 @@ class Agent
 
         $txtRate = (float) $this->config->get('sampleRate', 1.0);
         if ($txtRate < 1.0 && mt_rand(1, 100) > ($txtRate * 100)) {
+            // @codeCoverageIgnoreStart
             $this->sampleRateApplied = true;
+            // @codeCoverageIgnoreEnd
         }
     }
     /**

@@ -43,7 +43,9 @@ class Http implements TransportInterface
     {
         $endpoint = sprintf('%s/intake/v2/events', $this->config->get('transport.host'));
         if (null === $this->curl) {
+            // @codeCoverageIgnoreStart
             $this->curl = new Curl();
+            // @codeCoverageIgnoreEnd
         }
         $data = $store->toNdJson();
 

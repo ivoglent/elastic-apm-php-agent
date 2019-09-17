@@ -35,6 +35,7 @@ class ConfigTest extends TestCase
             'minimumSpanDuration' => 20,
             'maximumTransactionSpan' => 100,
             'sampleRate' => 1.0,
+            'enableMetrics' => false,
             'name' => 'test'
         ];
         $realConfig = $config->asArray();
