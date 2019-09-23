@@ -39,7 +39,7 @@ class TracesStoreTest extends TestCase
         $transaction->setId('TransactionId');
         $transaction->start();
 
-        $span = $factory->newSpan('test', 'test');
+        $span = $factory->newSpan('test', 'test', 'subTest');
         $span->setId('TestSpanId');
         $span->setParentId('parentId');
         $span->setTraceId('traceId');
@@ -60,15 +60,15 @@ class TracesStoreTest extends TestCase
         $reflectionProperty->setValue($span, 0);
 
         $traceStore->register($span);
-        $expected = '{"span":{"id":"TestSpanId","action":null,"transaction_id":"TransactionId","trace_id":"transactionTraceId","start":0,"parent_id":"parentId","name":"test","type":"test","timestamp":123456789,"duration":0,"sync":false,"context":null,"stacktrace":null}}';
+        $expected = '{"span":{"id":"TestSpanId","action":null,"transaction_id":"TransactionId","trace_id":"transactionTraceId","start":0,"parent_id":"parentId","name":"test","type":"test","subtype":"subTest","timestamp":123456789,"duration":0,"sync":false,"context":null,"stacktrace":null}}';
         $this->assertSame($expected, trim($traceStore->toNdJson()));
 
-        $expectedSerilize = '[{"span":{"id":"TestSpanId","action":null,"transaction_id":"TransactionId","trace_id":"transactionTraceId","start":0,"parent_id":"parentId","name":"test","type":"test","timestamp":123456789,"duration":0,"sync":false,"context":null,"stacktrace":null}}]';
+        $expectedSerilize = '[{"span":{"id":"TestSpanId","action":null,"transaction_id":"TransactionId","trace_id":"transactionTraceId","start":0,"parent_id":"parentId","name":"test","type":"test","subtype":"subTest","timestamp":123456789,"duration":0,"sync":false,"context":null,"stacktrace":null}}]';
         $this->assertSame($expectedSerilize, \json_encode($traceStore->jsonSerialize()));
 
         $span->addStacktraces(['test']);
 
-        $expected = '{"span":{"id":"TestSpanId","action":null,"transaction_id":"TransactionId","trace_id":"transactionTraceId","start":0,"parent_id":"parentId","name":"test","type":"test","timestamp":123456789,"duration":0,"sync":false,"context":null,"stacktrace":["test"]}}';
+        $expected = '{"span":{"id":"TestSpanId","action":null,"transaction_id":"TransactionId","trace_id":"transactionTraceId","start":0,"parent_id":"parentId","name":"test","type":"test","subtype":"subTest","timestamp":123456789,"duration":0,"sync":false,"context":null,"stacktrace":["test"]}}';
         $this->assertSame($expected, trim($traceStore->toNdJson()));
 
     }

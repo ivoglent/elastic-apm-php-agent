@@ -4,6 +4,7 @@
 namespace PhilKra\Tests\Traces;
 
 
+use PhilKra\Exception\InvalidTimeException;
 use PhilKra\Traces\Span;
 use PhilKra\Traces\SpanContexts\Http;
 use PhilKra\Traces\Stacktrace;
@@ -49,6 +50,7 @@ class SpanTest extends TestCase
                 'parent_id' => null,
                 'name' => 'TestName',
                 'type' => 'TestType',
+                'subtype' => null,
                 'timestamp' => 123456789,
                 'duration' => null,
                 'sync' => false,
@@ -59,7 +61,7 @@ class SpanTest extends TestCase
 
         $this->assertSame($expectedPayload, $this->span->jsonSerialize());
     }
-
+    
     public function testSetAction() {
         $expectedPayload = [
             'span' => [
@@ -71,6 +73,7 @@ class SpanTest extends TestCase
                 'parent_id' => null,
                 'name' => 'TestName',
                 'type' => 'TestType',
+                'subtype' => null,
                 'timestamp' => 123456789,
                 'duration' => null,
                 'sync' => false,
@@ -95,6 +98,7 @@ class SpanTest extends TestCase
                 'parent_id' => null,
                 'name' => 'TestName',
                 'type' => 'TestType',
+                'subtype' => null,
                 'timestamp' => 123456789,
                 'duration' => null,
                 'sync' => false,
