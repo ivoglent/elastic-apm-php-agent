@@ -22,8 +22,6 @@ class MetricHelper
      */
     public function collectInformation(): array {
         $data = [];
-        $load = sys_getloadavg();
-        $data['system.cpu.total.norm.pct'] = $load[0];
         $mem = $this->getMemoryUsage();
         $data['system.memory.total'] = $mem['total'];
         $data['system.memory.actual.free'] = $mem['free'];
@@ -56,13 +54,15 @@ class MetricHelper
                 $mem['free'] = $data[1] * 1024;
             } else {
                 $free = shell_exec('free');
-                $free = (string) trim($free);
-                $free_arr = explode("\n", $free);
-                $memArray = explode(" ", $free_arr[1]);
-                $memArray = array_filter($memArray, function($value) { return ($value !== null && $value !== false && $value !== ''); });
-                $memArray = array_merge($memArray);
-                $mem['total'] = $memArray[1] * 1024;
-                $mem['free'] = $memArray[3] * 1024;
+                if (!empty($free)) {
+                    $free = (string) trim($free);
+                    $free_arr = explode("\n", $free);
+                    $memArray = explode(" ", $free_arr[1]);
+                    $memArray = array_filter($memArray, function($value) { return ($value !== null && $value !== false && $value !== ''); });
+                    $memArray = array_merge($memArray);
+                    $mem['total'] = $memArray[1] * 1024;
+                    $mem['free'] = $memArray[3] * 1024;
+                }
             }
         } catch (\Exception $exception) {
             //Can not get system memory info

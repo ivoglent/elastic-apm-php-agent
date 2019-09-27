@@ -7,7 +7,7 @@
         "php" : ">= 7.1",
         "guzzlehttp/guzzle": "6.*",
         "ramsey/uuid": "^3.7",
-        "ralouphie/getallheaders": "2.0.*",
+        "ralouphie/getallheaders": "^2.0.5 || ^3.0.0",
         "ext-curl" : "*",
         "ext-json": "*"
     },
@@ -45,6 +45,10 @@
         {
             "name" : "Dirk Tepe",
             "email": "dstepe@gmail.com"
+        },
+        {
+            "name" : "Long Nguyen",
+            "email": "ivoglent@gmail.com"
         }
     ]
 }
