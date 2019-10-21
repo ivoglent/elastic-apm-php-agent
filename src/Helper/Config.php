@@ -63,6 +63,21 @@ class Config
     }
 
     /**
+     * Set config with key-value
+     *
+     * @param string $key
+     * @param $value
+     */
+    public function set(string $key, $value)
+    {
+        if (array_key_exists($key, $this->config)) {
+            $this->config[$key] = array_merge($this->config[$key], $value);
+        } else {
+            $this->config[$key] = $value;
+        }
+    }
+
+    /**
      * Get the Default Config of the Agent
      *
      * @see https://github.com/philkra/elastic-apm-php-agent/issues/55
