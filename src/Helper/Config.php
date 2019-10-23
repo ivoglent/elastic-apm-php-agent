@@ -70,7 +70,7 @@ class Config
      */
     public function set(string $key, $value)
     {
-        if (array_key_exists($key, $this->config)) {
+        if (array_key_exists($key, $this->config) && is_array($this->config[$key])) {
             $this->config[$key] = array_merge($this->config[$key], $value);
         } else {
             $this->config[$key] = $value;
