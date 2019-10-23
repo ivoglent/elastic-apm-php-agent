@@ -51,4 +51,14 @@ class ConfigTest extends TestCase
         $this->assertSame('http', $config->get('transport.method'));
         $this->assertSame('test', $config->get('transport.nonexists', 'test'));
     }
+
+    public function testSetConfig() {
+        $config = new Config(['name' => 'test']);
+        $config->set('test-key', 'test-value');
+        $this->assertSame('test-value', $config->get('test-key'));
+        $config->set('name', 'test-value');
+        $this->assertSame('test-value', $config->get('name'));
+        $config->set('name', ['test-value']);
+        $this->assertSame( ['test-value'], $config->get('name'));
+    }
 }

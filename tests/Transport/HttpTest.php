@@ -18,13 +18,7 @@ class HttpTest extends TestCase
     /** @var  Http */
     private $http;
     public function setUp() {
-        $configMap = [
-            ['name', null, 'name'],
-            ['secretToken', null, 'testToken'],
-            ['transport.config', null, []]
-        ];
         $config = $this->createMock(Config::class);
-        $config->expects(self::atLeastOnce())->method('get')->willReturnMap($configMap);
         $this->http = new Http($config);
     }
 
@@ -41,6 +35,6 @@ class HttpTest extends TestCase
         $tracesStore = $this->createMock(TracesStore::class);
         $tracesStore->expects(self::once())->method('toNdJson')->willReturn('testData');
 
-        $this->http->send($tracesStore);
+        $this->http->send('http://example.com', $tracesStore->toNdJson());
     }
 }

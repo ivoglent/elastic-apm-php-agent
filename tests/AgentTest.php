@@ -29,7 +29,8 @@ class AgentTest extends TestCase {
         parent::setUp();
         $this->agent = new Agent([
             'name' => 'unit-test',
-            'version' => '1.0'
+            'version' => '1.0',
+            'secretToken' => 'test'
         ], [
             'user' => []
         ]);

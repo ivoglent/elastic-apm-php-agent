@@ -46,7 +46,7 @@ class TransportFactoryTest extends TestCase
     private function getFakeClient() {
         return new class implements \PhilKra\Transport\TransportInterface {
 
-            function send(TracesStore $store): bool
+            function send(string $url, string $data, ?array $headers = [], ?int $timeout = 3000): bool
             {
                 // TODO: Implement send() method.
             }

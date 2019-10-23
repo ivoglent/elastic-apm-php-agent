@@ -38,7 +38,7 @@ class Agent
      *
      * @var string
      */
-    public const VERSION = '6.6.12';
+    public const VERSION = '6.6.13';
 
     /**
      * Agent Name
@@ -122,8 +122,6 @@ class Agent
     }
 
     private function init() {
-        // Init http client
-        $this->httpClient = TransportFactory::new($this->config);
 
         // Init the Traces Factory
         $this->factory = new DefaultTracesFactory($this->getConfig());
@@ -246,12 +244,36 @@ class Agent
     public function send()
     {
         if (false === $this->traces->isEmpty()) {
-            $this->httpClient->send($this->traces);
+            // Init http client
+            $this->httpClient = TransportFactory::new($this->config);
+            $endpoint = sprintf('%s/intake/v2/events', $this->config->get('transport.host'));
+            $this->httpClient->send($endpoint, $this->traces->toNdJson(), $this->getRequestHeaders(), (int) $this->config->get('transport.timeout', 3000));
             $this->traces->reset();
             //This line used for some consumer command which never terminated and transaction start and end in the loop
             if (PHP_SAPI === 'cli') {
                 $this->init();
             }
         }
+    }
+
+    /**
+     * Get the Headers for the POST Request
+     *
+     * @return array
+     */
+    private function getRequestHeaders(): array
+    {
+        // Default Headers Set
+        $headers = [
+            'Content-Type: application/x-ndjson',
+            'User-Agent:'.sprintf('apm-agent-php/%s', self::VERSION),
+        ];
+
+        // Add Secret Token to Header
+        if (null !== $this->config->get('secretToken')) {
+            $headers[] = 'Authorization: '.sprintf('Bearer %s', $this->config->get('secretToken'));
+        }
+
+        return $headers;
     }
 }

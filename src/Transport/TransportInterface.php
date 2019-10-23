@@ -2,9 +2,7 @@
 
 namespace PhilKra\Transport;
 
-use PhilKra\Stores\TracesStore;
-
 interface TransportInterface
 {
-    public function send(TracesStore $store);
+    public function send(string $url, string $data, ?array $headers = [], ?int $timeout = 3000);
 }
